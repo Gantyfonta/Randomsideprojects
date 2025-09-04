@@ -3,9 +3,12 @@ Other Game ideas:
 - Ai that tries to guess what you draw.
 - Einstein, the ai who starts out with no knowledge and learns. Machine learning.
 - Procedurally generated city where you talk to npcs that are ai and each one responds differently as a different person. Can move through city with wasd or arrow keys and space to interact. 
+- Significant figures calculator that allows you to do the math along with rounding automatically and telling you the amount of SF.
+- Calculator
+- 
+
 
 -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,13 +34,35 @@ Other Game ideas:
       font-size: 2.5rem;
     }
 
+    details {
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      margin: 1rem auto;
+      max-width: 1000px;
+      text-align: left;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    summary {
+      cursor: pointer;
+      padding: 1rem;
+      font-size: 1.3rem;
+      font-weight: bold;
+      background: rgba(0,0,0,0.3);
+      list-style: none;
+      user-select: none;
+    }
+
+    summary::-webkit-details-marker {
+      display: none; /* hide default triangle */
+    }
+
     .games-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 1.5rem;
-      padding: 2rem;
-      max-width: 1000px;
-      margin: auto;
+      padding: 1.5rem;
     }
 
     .game-card {
@@ -46,6 +71,7 @@ Other Game ideas:
       padding: 1.5rem;
       box-shadow: 0 6px 15px rgba(0,0,0,0.3);
       transition: transform 0.2s ease, background 0.2s ease;
+      text-align: center;
     }
 
     .game-card:hover {
@@ -88,102 +114,114 @@ Other Game ideas:
   </style>
 </head>
 <body>
-  <!-- 🔹 CHANGE SITE NAME HERE -->
   <header>
     <h1>Some Random Side Projects</h1>
-    <p>Click a link below to become an addict.</p>
+    <p>Click a link below to explore.</p>
   </header>
 
-  <main class="games-container">
-    <!-- 🔹 COPY THIS BLOCK FOR EACH GAME -->
-    <div class="game-card">
-      <div class="game-title">Grak the Caveman AI (newest)</div>
-      <div class="game-description">Chat with Grak, a caveman AI with unique personality and quirks.</div>
-      <a class="game-btn" href="https://preview--aura-chat-copy-255598c1.base44.app/Chat?hide_badge=true" target="_blank">Play</a>
+  <!-- School Projects Section -->
+  <details>
+    <summary>📘 School Projects</summary>
+    <div class="games-container">
+      <!-- Example placeholder project -->
+      <div class="game-card">
+        <div class="game-title">Significant Figures Calculator</div>
+        <div class="game-description">Do math with rounding and automatic SF handling.</div>
+        <a class="game-btn" href="#" target="_blank">Try</a>
+      </div>
+      <!-- Add more school projects here -->
     </div>
+  </details>
 
- <div class="game-card">
-      <div class="game-title">Robert the AI</div>
-     <div class="game-description">Talk to the ultimate codemaking british ai.</div>
-      <a class="game-btn" href="https://app--code-crafter-ai-25f0c1f1.base44.app" target="_blank">Play</a>
-    </div>
+  <!-- Random Games Section -->
+  <details open>
+    <summary>🎮 Random Games</summary>
+    <div class="games-container">
+      <div class="game-card">
+        <div class="game-title">Grak the Caveman AI (newest)</div>
+        <div class="game-description">Chat with Grak, a caveman AI with unique personality and quirks.</div>
+        <a class="game-btn" href="https://preview--aura-chat-copy-255598c1.base44.app/Chat?hide_badge=true" target="_blank">Play</a>
+      </div>
 
-<div class="game-card">
-      <div class="game-title">Culinary Craft</div>
-     <div class="game-description">Jesse, we need to cook.</div>
-      <a class="game-btn" href="https://culinary-craft-07cb0bc3.base44.app/" target="_blank">Play</a>
-    </div>
+      <div class="game-card">
+        <div class="game-title">Robert the AI</div>
+        <div class="game-description">Talk to the ultimate codemaking British AI.</div>
+        <a class="game-btn" href="https://app--code-crafter-ai-25f0c1f1.base44.app" target="_blank">Play</a>
+      </div>
 
-<div class="game-card">
-      <div class="game-title">Forge of Legends</div>
-     <div class="game-description">Make cool weapons, fight stuff. Also you might want to zoom out to see the weapons. (ctrl - or +)</div>
-      <a class="game-btn" href="https://forge-of-legends-7e55fd62.base44.app/Forge" target="_blank">Play</a>
-    </div>
-    
-    <div class="game-card">
-      <div class="game-title">Gambling</div>
-        <div class="game-description">Two words, Slot Machine.</div>
-      <a class="game-btn" href="https://gantyfonta.github.io/Gambling/" target="_blank">Play</a>
-    </div>
+      <div class="game-card">
+        <div class="game-title">Culinary Craft</div>
+        <div class="game-description">Jesse, we need to cook.</div>
+        <a class="game-btn" href="https://culinary-craft-07cb0bc3.base44.app/" target="_blank">Play</a>
+      </div>
 
- <div class="game-card">
-      <div class="game-title">The Maze</div>
-     <div class="game-description">It's simple, run from a mintaur in a maze.</div>
-      <a class="game-btn" href="https://gantyfonta.github.io/TheMaze/" target="_blank">Play</a>
-    </div>
+      <div class="game-card">
+        <div class="game-title">Forge of Legends</div>
+        <div class="game-description">Make cool weapons, fight stuff. (Zoom out to see full weapons)</div>
+        <a class="game-btn" href="https://forge-of-legends-7e55fd62.base44.app/Forge" target="_blank">Play</a>
+      </div>
 
- <div class="game-card">
-      <div class="game-title">MultiCode Runner</div>
-   <div class="game-description">This website can run most of other websites / code inside of it.</div>
-      <a class="game-btn" href="https://gantyfonta.github.io/Multicoderunner/" target="_blank">Play</a>
-    </div>
-    
- <div class="game-card">
-      <div class="game-title">RNG</div>
-   <div class="game-description">A poorly made rng game.</div>
-      <a class="game-btn" href="https://gantyfonta.github.io/Rng/" target="_blank">Play</a>
-    </div>
+      <div class="game-card">
+        <div class="game-title">Gambling</div>
+        <div class="game-description">Two words: Slot Machine.</div>
+        <a class="game-btn" href="https://gantyfonta.github.io/Gambling/" target="_blank">Play</a>
+      </div>
 
-<div class="game-card">
-      <div class="game-title">Poker</div>
-  <div class="game-description">Classic poker.</div>
-      <a class="game-btn" href="https://gantyfonta.github.io/Poker/" target="_blank">Play</a>
-    </div>
+      <div class="game-card">
+        <div class="game-title">The Maze</div>
+        <div class="game-description">Run from a minotaur in a maze.</div>
+        <a class="game-btn" href="https://gantyfonta.github.io/TheMaze/" target="_blank">Play</a>
+      </div>
 
-    <div class="game-card">
-      <div class="game-title">Blackjack</div>
-      <div class="game-description">Reach 21 to win.</div>
-      <a class="game-btn" href="https://gantyfonta.github.io/Blackjack/" target="_blank">Play</a>
-    </div>
-    
-       <div class="game-card">
-      <div class="game-title">Russian Roulette</div>
-         <div class="game-description">Simple bad russian roulette.</div>
-      <a class="game-btn" href="https://gantyfonta.github.io/RussianRoulette/" target="_blank">Play</a>
-    </div>
-    
- <div class="game-card">
-      <div class="game-title">Grak 2.0</div>
-   <div class="game-description">Grak, but with oddly obsesed with space and Roberts first appearance.</div>
-      <a class="game-btn" href="https://gantyfonta.github.io/grak2.0/" target="_blank">Play</a>
-    </div>
+      <div class="game-card">
+        <div class="game-title">MultiCode Runner</div>
+        <div class="game-description">Run most other websites / code inside of it.</div>
+        <a class="game-btn" href="https://gantyfonta.github.io/Multicoderunner/" target="_blank">Play</a>
+      </div>
 
- <div class="game-card">
-      <div class="game-title">Grak (oldest)</div>
-   <div class="game-description">The oldest primordial Grak.</div>
-      <a class="game-btn" href="https://gantyfonta.github.io/grak/" target="_blank">Play</a>
+      <div class="game-card">
+        <div class="game-title">RNG</div>
+        <div class="game-description">A poorly made RNG game.</div>
+        <a class="game-btn" href="https://gantyfonta.github.io/Rng/" target="_blank">Play</a>
+      </div>
+
+      <div class="game-card">
+        <div class="game-title">Poker</div>
+        <div class="game-description">Classic poker.</div>
+        <a class="game-btn" href="https://gantyfonta.github.io/Poker/" target="_blank">Play</a>
+      </div>
+
+      <div class="game-card">
+        <div class="game-title">Blackjack</div>
+        <div class="game-description">Reach 21 to win.</div>
+        <a class="game-btn" href="https://gantyfonta.github.io/Blackjack/" target="_blank">Play</a>
+      </div>
+
+      <div class="game-card">
+        <div class="game-title">Russian Roulette</div>
+        <div class="game-description">Simple (bad) Russian Roulette.</div>
+        <a class="game-btn" href="https://gantyfonta.github.io/RussianRoulette/" target="_blank">Play</a>
+      </div>
+
+      <div class="game-card">
+        <div class="game-title">Grak 2.0</div>
+        <div class="game-description">Grak, but obsessed with space. Robert’s first appearance.</div>
+        <a class="game-btn" href="https://gantyfonta.github.io/grak2.0/" target="_blank">Play</a>
+      </div>
+
+      <div class="game-card">
+        <div class="game-title">Grak (oldest)</div>
+        <div class="game-description">The oldest primordial Grak.</div>
+        <a class="game-btn" href="https://gantyfonta.github.io/grak/" target="_blank">Play</a>
+      </div>
+
+      <div class="game-card">
+        <div class="game-title">This Website</div>
+        <div class="game-description">A link to the current website you are on.</div>
+        <a class="game-btn" href="https://gantyfonta.github.io/Randomsideprojects/" target="_blank">Play</a>
+      </div>
     </div>
-
-
- <div class="game-card">
-      <div class="game-title">This Website</div>
-   <div class="game-description">A link to the current website you are on.</div>
-      <a class="game-btn" href="https://gantyfonta.github.io/Randomsideprojects/" target="_blank">Play</a>
-    </div>
-    
-    <!-- Repeat structure for other games -->
-
-  </main>
+  </details>
 
   <footer>
     © 2025 My Games. All rights reserved.
