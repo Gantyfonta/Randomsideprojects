@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Doodle Jump — Single File</title>
+<style>
+  :root{--bg:#87ceeb;--platform:#2e8b57;--player:#ff6b6b}
+  html,body{height:100%;margin:0;background:var(--bg);display:flex;align-items:center;justify-content:center}
+  canvas{max-width:900px;width:100%;height:700px;box-shadow:0 8px 30px rgba(0,0,0,.25);border-radius:8px;background:linear-gradient(#e0f7ff,#87ceeb)}
+  .hint{position:fixed;left:12px;bottom:12px;font-family:system-ui,Segoe UI,Roboto,Arial;color:#022}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="hint">Arrow keys / A D to move • Tap or click to jump when on a platform • R to restart</div>
+<script>
+// Doodle Jump — single-file implementation with high score saved to localStorage
+(() => {
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+
+  const BASE_W = 480, BASE_H = 800;
+  function resize(){
+    const scale = Math.min(window.innerWidth - 40, window.innerHeight - 120) / BASE_W;
+    canvas.width = Math.round(BASE_W * scale);
+    canvas.height = Math.round(BASE_H * scale);
+    ctx.setTransform(scale,0,0,scale,0,0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const gravity = 0.35;
+  const player = {x: BASE_W/2 - 20, y: BASE_H - 100, w: 40, h: 50, vx:0, vy:0};
+  let platforms = [];
+  let maxHeight = 0; let score = 0; let best = Number(localStorage.getItem('doodle_best') || 0);
+  let gameState = 'menu'; // 'menu','playing','dead'
+  let frames = 0;
+
+  function rand(min,max){ return Math.random()*(max-min)+min; }
+
+  function makeInitialPlatforms(){ platforms = []; const gap = 80; let y = BASE_H - 30; while(y > -2000){ const x = rand(20, BASE_W - 90); platforms.push({x,y,w:80,h:12,type:'normal',vx:0}); y -= gap + rand(-20,40); } platforms.sort((a,b)=>b.y-a.y); }
+
+  function spawnAbove(){ // ensure platforms exist above camera when scrolling
+    const highest = Math.min(...platforms.map(p => p.y));
+    while(highest > player.y - 1000){ // generate more above
+      const x = rand(20, BASE_W - 90); const y = highest - rand(60,120);
+      platforms.push({x,y,w:rand(60,100),h:12,type: Math.random()<0.12?'moving':'normal',vx: Math.random()<0.12?rand(0.6,1.2):0});
+      platforms.sort((a,b)=>b.y-a.y);
+    }
+  }
+
+  function start(){ player.x = BASE_W/2 - 20; player.y = BASE_H - 100; player.vx = 0; player.vy = 0; frames = 0; maxHeight = player.y; score = 0; gameState = 'playing'; makeInitialPlatforms(); }
+
+  function restart(){ start(); }
+
+  function update(){ frames++;
+    if(gameState !== 'playing') return;
+
+    // controls
+    const left = keys['arrowleft'] || keys['a']; const right = keys['arrowright'] || keys['d'];
+    if(left) player.vx -= 0.35; if(right) player.vx += 0.35; player.vx *= 0.95; if(Math.abs(player.vx) < 0.01) player.vx = 0;
+
+    player.vy += gravity; player.x += player.vx; player.y += player.vy;
+
+    // wrap horizontally
+    if(player.x + player.w < 0) player.x = BASE_W; if(player.x > BASE_W) player.x = -player.w;
+
+    // collision with platforms (only when falling)
+    if(player.vy > 0){
+      for(const p of platforms){
+        if(player.x + player.w > p.x && player.x < p.x + p.w){
+          if(player.y + player.h > p.y && player.y + player.h < p.y + p.h + player.vy + 1){
+            if(p.type === 'normal' || p.type === 'moving'){
+              player.y = p.y - player.h; player.vy = -11.5; // bounce
+            }
+          }
+        }
+      }
+    }
+
+    // move platforms
+    for(const p of platforms){ if(p.type === 'moving'){ p.x += Math.sin(frames * 0.02) * 1.6; if(p.x < 0) p.x = 0; if(p.x + p.w > BASE_W) p.x = BASE_W - p.w; } }
+
+    // scroll up if player goes above center
+    const cameraY = Math.max(0, player.y - BASE_H*0.4);
+    if(player.y < maxHeight) maxHeight = player.y;
+    score = Math.max(score, Math.floor((BASE_H - maxHeight)));
+
+    // remove platforms below bottom and spawn above
+    platforms = platforms.filter(p=> p.y < BASE_H + 200);
+    // move everything down as camera moves up
+    const scroll = Math.max(0, (BASE_H*0.4) - player.y);
+    if(scroll > 0){ player.y += scroll; for(const p of platforms){ p.y += scroll; } }
+
+    spawnAbove();
+
+    // death when player falls below bottom
+    if(player.y > BASE_H + 200){ gameOver(); }
+  }
+
+  function gameOver(){ gameState = 'dead'; if(score > best){ best = score; localStorage.setItem('doodle_best', best); } }
+
+  function draw(){ ctx.clearRect(0,0,BASE_W,BASE_H);
+    // background
+    // draw clouds
+    for(let i=0;i<6;i++){ ctx.globalAlpha = 0.6; ctx.beginPath(); ctx.ellipse((i*130 + frames*0.2)%BASE_W, 60 + (i%2)*20, 36,20,0,0,Math.PI*2); ctx.fillStyle='white'; ctx.fill(); }
+    ctx.globalAlpha =1;
+
+    // draw platforms
+    for(const p of platforms){ ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--platform') || '#2e8b57'; ctx.fillRect(p.x, p.y, p.w, p.h); ctx.fillStyle='rgba(255,255,255,0.08)'; ctx.fillRect(p.x, p.y, p.w, 3); }
+
+    // draw player
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--player') || '#ff6b6b'; ctx.beginPath(); ctx.ellipse(player.x + player.w/2, player.y + player.h/2, player.w/2, player.h/2, 0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#000'; ctx.fillRect(player.x + player.w/4, player.y + player.h/4, 6,6);
+
+    // HUD
+    ctx.fillStyle = '#012'; ctx.font='20px system-ui, Arial'; ctx.textAlign='left'; ctx.fillText('Score: ' + score, 12, 28); ctx.fillText('Best: ' + best, 12, 54);
+
+    if(gameState === 'menu'){
+      ctx.fillStyle='rgba(0,0,0,0.45)'; ctx.fillRect(BASE_W/2 - 180, BASE_H/2 - 110, 360,220);
+      ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.font='28px system-ui, Arial'; ctx.fillText('Doodle Jump — Click/Press to Start', BASE_W/2, BASE_H/2 - 20);
+      ctx.font='16px system-ui, Arial'; ctx.fillText('Arrow keys / A D to move — Tap/click to jump', BASE_W/2, BASE_H/2 + 10);
+    }
+
+    if(gameState === 'dead'){
+      ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fillRect(BASE_W/2 - 180, BASE_H/2 - 110, 360,220);
+      ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.font='34px system-ui, Arial'; ctx.fillText('Game Over', BASE_W/2, BASE_H/2 - 20);
+      ctx.font='20px system-ui, Arial'; ctx.fillText('Score: ' + score + ' • Best: ' + best, BASE_W/2, BASE_H/2 + 16);
+      ctx.font='16px system-ui, Arial'; ctx.fillText('Press R to restart', BASE_W/2, BASE_H/2 + 50);
+    }
+  }
+
+  // Input
+  const keys = {};
+  window.addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; if(e.key === 'r' || e.key === 'R'){ restart(); } if(gameState === 'menu' && (e.key === ' '|| e.key === 'ArrowUp')){ start(); } });
+  window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+  window.addEventListener('mousedown', e => { if(gameState === 'menu') start(); else if(gameState === 'dead') restart(); else { if(Math.abs(player.vy) < 0.1) player.vy = -11.5; } });
+  window.addEventListener('touchstart', e => { e.preventDefault(); if(gameState === 'menu') start(); else if(gameState === 'dead') restart(); else { if(Math.abs(player.vy) < 0.1) player.vy = -11.5; } }, {passive:false});
+
+  // Main loop
+  function loop(){ update(); draw(); requestAnimationFrame(loop); }
+
+  // initialize
+  makeInitialPlatforms(); draw(); requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
