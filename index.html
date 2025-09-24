@@ -50,6 +50,37 @@ for how long you can see it for before it dissapears.
 
     footer{padding:16px;text-align:center;color:var(--muted)}
   </style>
+
+  <script>
+(function() {
+  // 🔹 Edit this dictionary to add your secret words & destinations
+  const secretPages = {
+    "bird": "bird.html",
+    "blank": "blank.html"
+  };
+
+  let buffer = "";
+
+  // Listen for typed keys anywhere on the page
+  document.addEventListener("keydown", function(e) {
+    if (e.key.length === 1) { // only letters/numbers
+      buffer += e.key.toLowerCase();
+
+      // Check if buffer matches any secret word
+      for (const word in secretPages) {
+        if (buffer.endsWith(word.toLowerCase())) {
+          window.location.href = secretPages[word];
+        }
+      }
+
+      // Keep buffer short (avoid memory issues)
+      if (buffer.length > 30) buffer = buffer.slice(-30);
+    }
+  });
+})();
+</script>
+
+  
 </head>
 <body>
   <header>
