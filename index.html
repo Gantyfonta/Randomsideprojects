@@ -14,222 +14,147 @@ for how long you can see it for before it dissapears.
 
 -->
 <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Random Side Projects</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
-      body {
-        font-family: 'Inter', sans-serif;
-      }
+      body { font-family: 'Inter', sans-serif; }
     </style>
+
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   </head>
+
   <body class="bg-gradient-to-b from-[#0b1220] to-[#08101a] text-[#eaf2ff]">
     <div id="root"></div>
+
+    <!-- ================= AI HELPER UI ================= -->
+    <div id="ai-helper" class="fixed bottom-4 right-4 z-50">
+      <button id="ai-toggle" class="bg-yellow-400 text-black px-4 py-2 rounded-full font-bold">
+        AI Help
+      </button>
+
+      <div id="ai-panel" class="hidden mt-2 w-80 bg-[#0f1726] rounded-xl p-3 shadow-xl">
+        <div id="ai-output" class="text-sm text-[#9fb0d6] h-40 overflow-y-auto mb-2"></div>
+        <input
+          id="ai-input"
+          placeholder="Ask something..."
+          class="w-full p-2 rounded bg-[#08101a] text-white outline-none"
+        />
+      </div>
+    </div>
+    <!-- ================================================= -->
 
     <script type="text/babel">
       const { useState, useEffect, useMemo, useRef } = React;
 
-      // --- Inlined Constants  <script src='https://cdn.jotfor.ms/agent/embedjs/019af5e228197d22b559e16fdf3ebe16b3a1/embed.js'>---
       const schoolProjects = [
         { title: 'Latin Dictionary WIP', description: 'Latin dictionary for all your latin dictionary needs!', link: 'https://gantyfonta.github.io/LD/' },
         { title: 'Significant Figures Calculator', description: 'Do math with rounding and automatic SF handling.', link: 'https://gantyfonta.github.io/SigFigCalc/' },
         { title: 'Latin AI', description: 'Ask for help to an AI chatbot.', link: 'https://latinusmagister.base44.app/' },
         { title: 'Outlet', description: 'Paste in flashcards or vocab words and study them.', link: 'https://gantyfonta.github.io/Outlet/' },
-        { title: 'Things From Grammer', description: 'I purposely misspelled Grammar to ragbait tesco.', link: 'https://gantyfonta.github.io/Grammar/' },
+        { title: 'Things From Grammer', description: 'I purposely misspelled Grammar.', link: 'https://gantyfonta.github.io/Grammar/' },
         { title: 'Graphing Calculator', description: 'Works with most graphs.', link: 'https://gantyfonta.github.io/gcalc/' },
       ];
 
       const randomGames = [
-        { title: 'Redstone Simulator', description: '2D Minecraft redstone simulation featuring many redstone components.', link: 'https://gantyfonta.github.io/redstone/' },
-        { title: 'Polytrack', description: 'Play a drive game made by Kodub.', link: 'https://gantyfonta.github.io/polytrack/' },
-        { title: 'Shapemon', description: 'A Pokemon battle style game, but with shapes.', link: 'https://gantyfonta.github.io/Shapemon/' },
-        { title: 'Emulator', description: 'Play several games from older consoles.', link: 'https://gantyfonta.github.io/wdbgub/emulator/index.html' },
-        { title: 'Numberle', description: 'Play higher or lower in a wordle-ish number guessing game.', link: 'https://gantyfonta.github.io/Numberle/' },
-        { title: 'Caesar\'s Spelling Bee', description: 'Spell out the spoken latin words.', link: 'https://gantyfonta.github.io/SpellingBee/' },
-        { title: 'Chess', description: 'Play chess against someone online.', link: 'https://gantyfonta.github.io/chess/' },
-        { title: 'Stonks', description: 'Pretend you have stocks in an always changing stonks game.', link: 'https://gantyfonta.github.io/Stonks/' },
-        { title: 'Forge of Legends', description: 'Make cool weapons, fight stuff. (Zoom out to see full weapons)', link: 'https://forge-of-legends-7e55fd62.base44.app/Forge' },
-        { title: 'Gambling', description: 'Two words: Slot Machine.', link: 'https://gantyfonta.github.io/Gambling/' },
-        { title: 'The Maze', description: 'Run from a minotaur in a maze.', link: 'https://gantyfonta.github.io/TheMaze/' },
-        { title: 'RNG', description: 'A poorly made RNG game.', link: 'https://gantyfonta.github.io/Rng/' },
-        { title: 'Poker', description: 'Classic poker.', link: 'https://gantyfonta.github.io/Poker/' },
-        { title: 'Blackjack', description: 'Reach 21 to win.', link: 'https://gantyfonta.github.io/Blackjack/' },
-        { title: 'Russian Roulette', description: 'Simple (bad) Russian Roulette.', link: 'https://gantyfonta.github.io/RussianRoulette/' },
-        { title: 'Culinary Craft', description: 'Jesse, we need to cook.', link: 'https://culinary-craft-07cb0bc3.base44.app/' },
-        { title: 'Chalkboard', description: 'Draw on a chalkboard with people.', link: 'https://gantyfonta.github.io/chalkboard/' },
-        { title: 'Multiplayer Checkboxes', description: 'Click checkboxes and see them on other peoples screens.', link: 'https://gantyfonta.github.io/checkboxes/' },
-        { title: 'Lightbulb', description: 'To turn on or off lightbulbs.', link: 'https://gantyfonta.github.io/Lightbulb/' },
+        { title: 'Redstone Simulator', description: '2D Minecraft redstone simulation.', link: 'https://gantyfonta.github.io/redstone/' },
+        { title: 'Polytrack', description: 'Drive game.', link: 'https://gantyfonta.github.io/polytrack/' },
+        { title: 'Shapemon', description: 'Pokemon but shapes.', link: 'https://gantyfonta.github.io/Shapemon/' },
       ];
 
       const miscProjects = [
-          { title: 'Conflict', description: 'A simple messaging app that looks familiar.', link: 'https://gantyfonta.github.io/conflict/' },
-          { title: 'Conflict Rooms', description: 'A room based meeting site that works like Zoom and looks like Conflict.', link: 'https://gantyfonta.github.io/conflict-chat/' },
-          { title: 'Hand Physics Lab', description: 'A hand and face tracking simulation in 3D.', link: 'https://gantyfonta.github.io/HandPhysicsLab/' },
-          { title: 'Grak the AI Caveman (newest)', description: 'Chat with Grak, a caveman AI.', link: 'https://preview--aura-chat-copy-255598c1.base44.app/Chat?hide_badge=true' },
-          { title: 'Synthesizer', description: 'Make music.', link: 'https://gantyfonta.github.io/synthesizer/' },
-          { title: 'Robert the AI', description: 'Talk to the ultimate codemaking British AI.', link: 'https://app--code-crafter-ai-25f0c1f1.base44.app' },
-          { title: 'GantyMail', description: 'Another email(chat) system to talk to people.', link: 'https://gantyfonta.github.io/gantymail/' },
-          { title: 'Blurp', description: 'Create an account, add people and talk to them.', link: 'https://gantyfonta.github.io/blurp/' },
-          { title: 'MultiCode Runner', description: 'Run most other websites / code inside of it.', link: 'https://gantyfonta.github.io/Multicoderunner/' },
-          { title: 'Grak 2.0', description: 'Grak, but obsessed with space. Robert’s first appearance.', link: 'https://gantyfonta.github.io/grak2.0/' },
-          { title: 'Grak (oldest)', description: 'The oldest primordial Grak.', link: 'https://gantyfonta.github.io/grak/' },
-          { title: 'This Website', description: 'A link to the current website you are on.', link: 'https://gantyfonta.github.io/Randomsideprojects/' },
+        { title: 'Conflict', description: 'Messaging app.', link: 'https://gantyfonta.github.io/conflict/' },
+        { title: 'Synthesizer', description: 'Make music.', link: 'https://gantyfonta.github.io/synthesizer/' },
       ];
 
-      const secretPages = {
-        bird: 'bird.html',
-        jump: 'jump.html',
-      };
-
-      // --- Inlined Card Component ---
-      const Card = ({ data, buttonText = "Try" }) => {
-        return (
-          <div className="bg-[#0f1726] p-4 rounded-xl text-center transition-all duration-200 ease-in-out hover:transform hover:scale-105 hover:bg-[rgba(255,255,255,0.08)] flex flex-col justify-between">
-            <div>
-              <h3 className="text-lg font-bold text-white mb-2 truncate">{data.title}</h3>
-              <p className="text-sm text-[#9fb0d6] mb-3 h-10 overflow-hidden">{data.description}</p>
-            </div>
-            <a
-              href={data.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block mt-2 py-2 px-4 rounded-lg bg-[#ffcc00] text-[#071226] text-sm font-bold no-underline transition-transform duration-200 hover:scale-110"
-            >
-              {buttonText}
-            </a>
-          </div>
-        );
-      };
-
-      // --- Inlined App Component ---
-      const App = () => {
-        const [activeTab, setActiveTab] = useState('school');
-        const [searchQuery, setSearchQuery] = useState('');
-        const keyBuffer = useRef('');
-
-        useEffect(() => {
-          const handleKeyDown = (e) => {
-            if (e.key.length === 1) { // only letters/numbers
-              keyBuffer.current += e.key.toLowerCase();
-
-              for (const word in secretPages) {
-                if (keyBuffer.current.endsWith(word.toLowerCase())) {
-                  window.location.href = secretPages[word];
-                }
-              }
-
-              if (keyBuffer.current.length > 30) {
-                  keyBuffer.current = keyBuffer.current.slice(-30);
-              }
-            }
-          };
-          
-          document.addEventListener('keydown', handleKeyDown);
-          return () => {
-            document.removeEventListener('keydown', handleKeyDown);
-          };
-        }, []);
-
-        const handleTabClick = (tab) => {
-          setActiveTab(tab);
-          setSearchQuery(''); 
-        };
-        
-        const filterData = (data, query) => {
-          if (!query) return data;
-          return data.filter(item =>
-            item.title.toLowerCase().includes(query.toLowerCase()) ||
-            item.description.toLowerCase().includes(query.toLowerCase())
-          );
-        };
-        
-        const filteredSchoolProjects = useMemo(() => filterData(schoolProjects, searchQuery), [searchQuery]);
-        const filteredRandomGames = useMemo(() => filterData(randomGames, searchQuery), [searchQuery]);
-        const filteredMiscProjects = useMemo(() => filterData(miscProjects, searchQuery), [searchQuery]);
-
-        return (
-          <div className="min-h-screen flex flex-col">
-            <header className="p-5 text-center bg-gradient-to-b from-[rgba(255,255,255,0.02)] to-transparent relative">
-              <h1 className="text-3xl font-bold">Some Random Side Projects</h1>
-              <p className="text-[#9fb0d6] mt-1">Switch between tabs to explore</p>
-              <div className="absolute top-5 right-5">
-                  <input 
-                    type="text" 
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-10 sm:w-12 md:w-48 p-2 rounded-full border-none outline-none transition-all duration-300 ease-in-out bg-[#0f1726] text-white focus:w-48 md:focus:w-64 focus:ring-2 focus:ring-[#ffcc00]" 
-                    placeholder="Search..."
-                  />
-              </div>
-            </header>
-
-            <div className="flex justify-center gap-2.5 my-5">
-              <button 
-                className={`py-2.5 px-5 rounded-lg border-none cursor-pointer transition-all duration-200 hover:transform hover:scale-105 ${activeTab === 'school' ? 'bg-gradient-to-r from-[#ffcc00] to-[#9b6eff] text-[#071226] font-bold' : 'bg-[#0f1726] text-[#9fb0d6]'}`}
-                onClick={() => handleTabClick('school')}
-              >
-                School Projects
-              </button>
-              <button 
-                className={`py-2.5 px-5 rounded-lg border-none cursor-pointer transition-all duration-200 hover:transform hover:scale-105 ${activeTab === 'games' ? 'bg-gradient-to-r from-[#ffcc00] to-[#9b6eff] text-[#071226] font-bold' : 'bg-[#0f1726] text-[#9fb0d6]'}`}
-                onClick={() => handleTabClick('games')}
-              >
-                Random Games
-              </button>
-              <button 
-                className={`py-2.5 px-5 rounded-lg border-none cursor-pointer transition-all duration-200 hover:transform hover:scale-105 ${activeTab === 'misc' ? 'bg-gradient-to-r from-[#ffcc00] to-[#9b6eff] text-[#071226] font-bold' : 'bg-[#0f1726] text-[#9fb0d6]'}`}
-                onClick={() => handleTabClick('misc')}
-              >
-                Miscellaneous
-              </button>
-            </div>
-
-            <main className="flex-1 max-w-7xl w-full mx-auto px-4">
-              {activeTab === 'school' && (
-                <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-5">
-                  {filteredSchoolProjects.map(project => <Card key={project.title} data={project} buttonText="Try" />)}
-                </section>
-              )}
-              {activeTab === 'games' && (
-                <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 p-5">
-                  {filteredRandomGames.map(game => <Card key={game.title} data={game} buttonText="Play" />)}
-                </section>
-              )}
-              {activeTab === 'misc' && (
-                <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 p-5">
-                  {filteredMiscProjects.map(project => <Card key={project.title} data={project} buttonText="Open" />)}
-                </section>
-              )}
-            </main>
-
-            <footer className="p-4 text-center text-xs text-[#9fb0d6]">
-              All of these games were made by AI and in my free time. Some suck, some are fun. © 2025 gantyfonta trademarked, patented, etc.
-            </footer>
-          </div>
-        );
-      };
-
-      // --- Inlined root render ---
-      const rootElement = document.getElementById('root');
-      if (!rootElement) {
-        throw new Error("Could not find root element to mount to");
-      }
-      const root = ReactDOM.createRoot(rootElement);
-      root.render(
-        <React.StrictMode>
-          <App />
-        </React.StrictMode>
+      const Card = ({ data, buttonText }) => (
+        <div className="bg-[#0f1726] p-4 rounded-xl hover:scale-105 transition">
+          <h3 className="font-bold">{data.title}</h3>
+          <p className="text-sm text-[#9fb0d6]">{data.description}</p>
+          <a href={data.link} target="_blank" className="inline-block mt-2 bg-yellow-400 text-black px-3 py-1 rounded">
+            {buttonText}
+          </a>
+        </div>
       );
+
+      const App = () => {
+        const [tab, setTab] = useState("school");
+
+        return (
+          <div className="p-6">
+            <h1 className="text-3xl font-bold mb-4">Random Side Projects</h1>
+
+            <div className="flex gap-2 mb-4">
+              <button onClick={() => setTab("school")}>School</button>
+              <button onClick={() => setTab("games")}>Games</button>
+              <button onClick={() => setTab("misc")}>Misc</button>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {(tab === "school" ? schoolProjects : tab === "games" ? randomGames : miscProjects)
+                .map(p => <Card key={p.title} data={p} buttonText="Open" />)}
+            </div>
+          </div>
+        );
+      };
+
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
-  <div class="embedded-agent-container"></div>
+
+    <!-- ================= AI LOGIC ================= -->
+    <script>
+      const API_KEY = "AIzaSyCZux6_3i9F27dzNo3iP40gK7hKMHNVYwU";
+
+      const toggle = document.getElementById("ai-toggle");
+      const panel = document.getElementById("ai-panel");
+      const input = document.getElementById("ai-input");
+      const output = document.getElementById("ai-output");
+
+      toggle.onclick = () => panel.classList.toggle("hidden");
+
+      input.addEventListener("keydown", async (e) => {
+        if (e.key !== "Enter") return;
+
+        const userText = input.value.trim();
+        if (!userText) return;
+
+        input.value = "";
+        output.innerHTML += `<div><b>You:</b> ${userText}</div>`;
+
+        const res = await fetch(
+          "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + API_KEY,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: userText }] }]
+            })
+          }
+        );
+
+        const data = await res.json();
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
+
+        output.innerHTML += `<div class="mt-1"><b>AI:</b> ${reply}</div>`;
+        output.scrollTop = output.scrollHeight;
+      });
+    </script>
+    <!-- ============================================ -->
+
+  </body>
+</html>
+
   </body>
 </html>
