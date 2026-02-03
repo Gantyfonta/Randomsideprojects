@@ -1,18 +1,3 @@
-  <!--
-Other Game ideas:
-- Rubiks cube solver
-- Graphing Calculator
-- Tetris, but with global highscore leaderboards and possible "battle mode" where higher score wins between two people and both games are displayed on screen.
-- 3D platformer
-- 2D platformer
-- Synthisizer that you click on a square on a grid and it plays a sound from left to right like a song.
-- Memory Game that gives you a random number and you can change how many digits, and you have to recite it. When you recite it, the number dissapears. You can also set a timer
-for how long you can see it for before it dissapears.
-- 4 Player Chess
-- 
-- 
-
--->
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -24,9 +9,7 @@ for how long you can see it for before it dissapears.
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
-      body {
-        font-family: 'Inter', sans-serif;
-      }
+      body { font-family: 'Inter', sans-serif; }
     </style>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
@@ -36,9 +19,9 @@ for how long you can see it for before it dissapears.
     <div id="root"></div>
 
     <script type="text/babel">
-      const { useState, useEffect, useMemo, useRef } = React;
+      const { useState } = React;
 
-      // --- Inlined Constants  <script src='https://cdn.jotfor.ms/agent/embedjs/019af5e228197d22b559e16fdf3ebe16b3a1/embed.js'>---
+      // -------------------- DATA --------------------
       const schoolProjects = [
         { title: 'Latin Dictionary WIP', description: 'Latin dictionary for all your latin dictionary needs!', link: 'https://gantyfonta.github.io/LD/' },
         { title: 'Significant Figures Calculator', description: 'Do math with rounding and automatic SF handling.', link: 'https://gantyfonta.github.io/SigFigCalc/' },
@@ -49,13 +32,12 @@ for how long you can see it for before it dissapears.
       ];
 
       const randomGames = [
-        { title: 'Oink-O-Clock Jump', description: 'The single greatest game ever made.', link: 'https://gantyfonta.github.io/oinkoclockjump/' },
         { title: 'Redstone Simulator', description: '2D Minecraft redstone simulation featuring many redstone components.', link: 'https://gantyfonta.github.io/redstone/' },
         { title: 'Polytrack', description: 'Play a drive game made by Kodub.', link: 'https://gantyfonta.github.io/polytrack/' },
         { title: 'Shapemon', description: 'A Pokemon battle style game, but with shapes.', link: 'https://gantyfonta.github.io/Shapemon/' },
         { title: 'Emulator', description: 'Play several games from older consoles.', link: 'https://gantyfonta.github.io/wdbgub/emulator/index.html' },
         { title: 'Numberle', description: 'Play higher or lower in a wordle-ish number guessing game.', link: 'https://gantyfonta.github.io/Numberle/' },
-        { title: 'Caesar\'s Spelling Bee', description: 'Spell out the spoken latin words.', link: 'https://gantyfonta.github.io/SpellingBee/' },
+        { title: "Caesar's Spelling Bee", description: 'Spell out the spoken latin words.', link: 'https://gantyfonta.github.io/SpellingBee/' },
         { title: 'Chess', description: 'Play chess against someone online.', link: 'https://gantyfonta.github.io/chess/' },
         { title: 'Stonks', description: 'Pretend you have stocks in an always changing stonks game.', link: 'https://gantyfonta.github.io/Stonks/' },
         { title: 'Forge of Legends', description: 'Make cool weapons, fight stuff. (Zoom out to see full weapons)', link: 'https://forge-of-legends-7e55fd62.base44.app/Forge' },
@@ -72,165 +54,97 @@ for how long you can see it for before it dissapears.
       ];
 
       const miscProjects = [
-          { title: 'Conflict', description: 'A simple messaging app that looks familiar.', link: 'https://gantyfonta.github.io/conflict/' },
-          { title: 'Conflict Rooms', description: 'A room based meeting site that works like Zoom and looks like Conflict.', link: 'https://gantyfonta.github.io/conflict-chat/' },
-          { title: 'Hand Physics Lab', description: 'A hand and face tracking simulation in 3D.', link: 'https://gantyfonta.github.io/HandPhysicsLab/' },
-          { title: 'Grak the AI Caveman (newest)', description: 'Chat with Grak, a caveman AI.', link: 'https://preview--aura-chat-copy-255598c1.base44.app/Chat?hide_badge=true' },
-          { title: 'Synthesizer', description: 'Make music.', link: 'https://gantyfonta.github.io/synthesizer/' },
-          { title: 'Robert the AI', description: 'Talk to the ultimate codemaking British AI.', link: 'https://app--code-crafter-ai-25f0c1f1.base44.app' },
-          { title: 'GantyMail', description: 'Another email(chat) system to talk to people.', link: 'https://gantyfonta.github.io/gantymail/' },
-          { title: 'Blurp', description: 'Create an account, add people and talk to them.', link: 'https://gantyfonta.github.io/blurp/' },
-          { title: 'MultiCode Runner', description: 'Run most other websites / code inside of it.', link: 'https://gantyfonta.github.io/Multicoderunner/' },
-          { title: 'Grak 2.0', description: 'Grak, but obsessed with space. Robert’s first appearance.', link: 'https://gantyfonta.github.io/grak2.0/' },
-          { title: 'Grak (oldest)', description: 'The oldest primordial Grak.', link: 'https://gantyfonta.github.io/grak/' },
-          { title: 'This Website', description: 'A link to the current website you are on.', link: 'https://gantyfonta.github.io/Randomsideprojects/' },
+        { title: 'Conflict', description: 'A simple messaging app that looks familiar.', link: 'https://gantyfonta.github.io/conflict/' },
+        { title: 'Conflict Rooms', description: 'A room based meeting site that works like Zoom and looks like Conflict.', link: 'https://gantyfonta.github.io/conflict-chat/' },
+        { title: 'Hand Physics Lab', description: 'A hand and face tracking simulation in 3D.', link: 'https://gantyfonta.github.io/HandPhysicsLab/' },
+        { title: 'Grak the AI Caveman (newest)', description: 'Chat with Grak, a caveman AI.', link: 'https://preview--aura-chat-copy-255598c1.base44.app/Chat?hide_badge=true' },
+        { title: 'Synthesizer', description: 'Make music.', link: 'https://gantyfonta.github.io/synthesizer/' },
+        { title: 'Robert the AI', description: 'Talk to the ultimate codemaking British AI.', link: 'https://app--code-crafter-ai-25f0c1f1.base44.app' },
+        { title: 'GantyMail', description: 'Another email(chat) system to talk to people.', link: 'https://gantyfonta.github.io/gantymail/' },
+        { title: 'Blurp', description: 'Create an account, add people and talk to them.', link: 'https://gantyfonta.github.io/blurp/' },
+        { title: 'MultiCode Runner', description: 'Run most other websites / code inside of it.', link: 'https://gantyfonta.github.io/Multicoderunner/' },
+        { title: 'Grak 2.0', description: 'Grak, but obsessed with space. Robert’s first appearance.', link: 'https://gantyfonta.github.io/grak2.0/' },
+        { title: 'Grak (oldest)', description: 'The oldest primordial Grak.', link: 'https://gantyfonta.github.io/grak/' },
+        { title: 'This Website', description: 'A link to the current website you are on.', link: 'https://gantyfonta.github.io/Randomsideprojects/' },
       ];
 
-      const secretPages = {
-        bird: 'bird.html',
-        jump: 'jump.html',
-      };
+      const oinkStuff = [
+        { title: 'Oink-O-Clock Jump', description: 'The single greatest game ever made.', link: 'https://gantyfonta.github.io/oinkoclockjump/' },
+      ];
 
-      // --- Inlined Card Component ---
-      const Card = ({ data, buttonText = "Try" }) => {
-        return (
-          <div className="bg-[#0f1726] p-4 rounded-xl text-center transition-all duration-200 ease-in-out hover:transform hover:scale-105 hover:bg-[rgba(255,255,255,0.08)] flex flex-col justify-between">
-            <div>
-              <h3 className="text-lg font-bold text-white mb-2 truncate">{data.title}</h3>
-              <p className="text-sm text-[#9fb0d6] mb-3 h-10 overflow-hidden">{data.description}</p>
-            </div>
-            <a
-              href={data.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block mt-2 py-2 px-4 rounded-lg bg-[#ffcc00] text-[#071226] text-sm font-bold no-underline transition-transform duration-200 hover:scale-110"
-            >
-              {buttonText}
-            </a>
+      // -------------------- COMPONENTS --------------------
+      const Card = ({ data, buttonText = 'Open' }) => (
+        <div className="bg-[#0f1726] p-4 rounded-xl text-center transition-all duration-200 hover:scale-105 flex flex-col justify-between">
+          <div>
+            <h3 className="text-lg font-bold text-white mb-2 truncate">{data.title}</h3>
+            <p className="text-sm text-[#9fb0d6] mb-3 h-10 overflow-hidden">{data.description}</p>
           </div>
-        );
-      };
+          <a
+            href={data.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2 py-2 px-4 rounded-lg bg-[#ffcc00] text-[#071226] text-sm font-bold hover:scale-110 transition-transform"
+          >
+            {buttonText}
+          </a>
+        </div>
+      );
 
-      // --- Inlined App Component ---
+      // -------------------- APP --------------------
       const App = () => {
         const [activeTab, setActiveTab] = useState('school');
         const [searchQuery, setSearchQuery] = useState('');
-        const keyBuffer = useRef('');
 
-        useEffect(() => {
-          const handleKeyDown = (e) => {
-            if (e.key.length === 1) { // only letters/numbers
-              keyBuffer.current += e.key.toLowerCase();
-
-              for (const word in secretPages) {
-                if (keyBuffer.current.endsWith(word.toLowerCase())) {
-                  window.location.href = secretPages[word];
-                }
-              }
-
-              if (keyBuffer.current.length > 30) {
-                  keyBuffer.current = keyBuffer.current.slice(-30);
-              }
-            }
-          };
-          
-          document.addEventListener('keydown', handleKeyDown);
-          return () => {
-            document.removeEventListener('keydown', handleKeyDown);
-          };
-        }, []);
-
-        const handleTabClick = (tab) => {
-          setActiveTab(tab);
-          setSearchQuery(''); 
-        };
-        
-        const filterData = (data, query) => {
-          if (!query) return data;
-          return data.filter(item =>
-            item.title.toLowerCase().includes(query.toLowerCase()) ||
-            item.description.toLowerCase().includes(query.toLowerCase())
-          );
-        };
-        
-        const filteredSchoolProjects = useMemo(() => filterData(schoolProjects, searchQuery), [searchQuery]);
-        const filteredRandomGames = useMemo(() => filterData(randomGames, searchQuery), [searchQuery]);
-        const filteredMiscProjects = useMemo(() => filterData(miscProjects, searchQuery), [searchQuery]);
+        const filterData = (data) =>
+          !searchQuery
+            ? data
+            : data.filter(item =>
+                item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                item.description.toLowerCase().includes(searchQuery.toLowerCase())
+              );
 
         return (
           <div className="min-h-screen flex flex-col">
-            <header className="p-5 text-center bg-gradient-to-b from-[rgba(255,255,255,0.02)] to-transparent relative">
+            <header className="p-5 text-center">
               <h1 className="text-3xl font-bold">Some Random Side Projects</h1>
-              <p className="text-[#9fb0d6] mt-1">Switch between tabs to explore</p>
-              <div className="absolute top-5 right-5">
-                  <input 
-                    type="text" 
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-10 sm:w-12 md:w-48 p-2 rounded-full border-none outline-none transition-all duration-300 ease-in-out bg-[#0f1726] text-white focus:w-48 md:focus:w-64 focus:ring-2 focus:ring-[#ffcc00]" 
-                    placeholder="Search..."
-                  />
-              </div>
+              <input
+                className="mt-4 p-2 rounded bg-[#0f1726]"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+              />
             </header>
 
-            <div className="flex justify-center gap-2.5 my-5">
-              <button 
-                className={`py-2.5 px-5 rounded-lg border-none cursor-pointer transition-all duration-200 hover:transform hover:scale-105 ${activeTab === 'school' ? 'bg-gradient-to-r from-[#ffcc00] to-[#9b6eff] text-[#071226] font-bold' : 'bg-[#0f1726] text-[#9fb0d6]'}`}
-                onClick={() => handleTabClick('school')}
-              >
-                School Projects
-              </button>
-              <button 
-                className={`py-2.5 px-5 rounded-lg border-none cursor-pointer transition-all duration-200 hover:transform hover:scale-105 ${activeTab === 'games' ? 'bg-gradient-to-r from-[#ffcc00] to-[#9b6eff] text-[#071226] font-bold' : 'bg-[#0f1726] text-[#9fb0d6]'}`}
-                onClick={() => handleTabClick('games')}
-              >
-                Random Games
-              </button>
-              <button 
-                className={`py-2.5 px-5 rounded-lg border-none cursor-pointer transition-all duration-200 hover:transform hover:scale-105 ${activeTab === 'misc' ? 'bg-gradient-to-r from-[#ffcc00] to-[#9b6eff] text-[#071226] font-bold' : 'bg-[#0f1726] text-[#9fb0d6]'}`}
-                onClick={() => handleTabClick('misc')}
-              >
-                Miscellaneous
-              </button>
+            <div className="flex justify-center gap-2.5 my-5 flex-wrap">
+              {['school','games','misc','oink'].map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`py-2.5 px-5 rounded-lg transition-all hover:scale-105 ${
+                    activeTab === tab
+                      ? 'bg-gradient-to-r from-[#ffcc00] to-[#9b6eff] text-[#071226] font-bold'
+                      : 'bg-[#0f1726] text-[#9fb0d6]'
+                  }`}
+                >
+                  {tab === 'school' && 'School Projects'}
+                  {tab === 'games' && 'Random Games'}
+                  {tab === 'misc' && 'Miscellaneous'}
+                  {tab === 'oink' && "Oink O' Stuff"}
+                </button>
+              ))}
             </div>
 
-            <main className="flex-1 max-w-7xl w-full mx-auto px-4">
-              {activeTab === 'school' && (
-                <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-5">
-                  {filteredSchoolProjects.map(project => <Card key={project.title} data={project} buttonText="Try" />)}
-                </section>
-              )}
-              {activeTab === 'games' && (
-                <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 p-5">
-                  {filteredRandomGames.map(game => <Card key={game.title} data={game} buttonText="Play" />)}
-                </section>
-              )}
-              {activeTab === 'misc' && (
-                <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 p-5">
-                  {filteredMiscProjects.map(project => <Card key={project.title} data={project} buttonText="Open" />)}
-                </section>
-              )}
+            <main className="flex-1 max-w-7xl mx-auto w-full p-4">
+              {activeTab === 'school' && <section className="grid grid-cols-1 md:grid-cols-3 gap-4">{filterData(schoolProjects).map(p => <Card key={p.title} data={p} />)}</section>}
+              {activeTab === 'games' && <section className="grid grid-cols-1 md:grid-cols-3 gap-4">{filterData(randomGames).map(p => <Card key={p.title} data={p} buttonText="Play" />)}</section>}
+              {activeTab === 'misc' && <section className="grid grid-cols-1 md:grid-cols-3 gap-4">{filterData(miscProjects).map(p => <Card key={p.title} data={p} />)}</section>}
+              {activeTab === 'oink' && <section className="grid grid-cols-1 md:grid-cols-3 gap-4">{filterData(oinkStuff).map(p => <Card key={p.title} data={p} />)}</section>}
             </main>
-
-            <footer className="p-4 text-center text-xs text-[#9fb0d6]">
-              All of these games were made by AI and in my free time. Some suck, some are fun. © 2025 gantyfonta trademarked, patented, etc.
-            </footer>
           </div>
         );
       };
 
-      // --- Inlined root render ---
-      const rootElement = document.getElementById('root');
-      if (!rootElement) {
-        throw new Error("Could not find root element to mount to");
-      }
-      const root = ReactDOM.createRoot(rootElement);
-      root.render(
-        <React.StrictMode>
-          <App />
-        </React.StrictMode>
-      );
+      ReactDOM.createRoot(document.getElementById('root')).render(<App />);
     </script>
-  <div class="embedded-agent-container"></div>
   </body>
 </html>
