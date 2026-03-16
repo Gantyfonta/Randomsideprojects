@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -112,11 +113,19 @@
             <header className="p-5 text-center">
               <h1 className="text-3xl font-bold">Some Random Side Projects</h1>
               <input
-                className="mt-4 p-2 rounded bg-[#0f1726]"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-              />
+  className="mt-4 p-2 rounded bg-[#0f1726]"
+  placeholder="Search..."
+  value={searchQuery}
+  onChange={e => {
+    const value = e.target.value;
+    setSearchQuery(value);
+
+    // Check if the user types 'bird'
+    if (value.toLowerCase() === 'bird') {
+      window.location.href = 'bird.html'; // Redirect to bird.html
+    }
+  }}
+/>
             </header>
 
             <div className="flex justify-center gap-2.5 my-5 flex-wrap">
