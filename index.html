@@ -24,7 +24,6 @@
 
       // -------------------- DATA --------------------
       const schoolProjects = [
-        { title: 'Sprootgle Docs', description: 'A very familiar seeming document program.', link: 'https://sproot-docs.base44.app' },
         { title: 'Latin Dictionary WIP', description: 'Latin dictionary for all your latin dictionary needs!', link: 'https://gantyfonta.github.io/LD/' },
         { title: 'Significant Figures Calculator', description: 'Do math with rounding and automatic SF handling.', link: 'https://gantyfonta.github.io/SigFigCalc/' },
         { title: 'Latin AI', description: 'Ask for help to an AI chatbot.', link: 'https://latinusmagister.base44.app/' },
@@ -58,8 +57,6 @@
       ];
 
       const miscProjects = [
-        { title: 'Sprootify', description: 'A music app for all your music needs.', link: 'https://vibefy.base44.app/' },
-        { title: 'Conflict', description: 'A simple messaging app that looks familiar.', link: 'https://gantyfonta.github.io/conflict/' },
         { title: 'Conflict Rooms', description: 'A room based meeting site that works like Zoom and looks like Conflict.', link: 'https://gantyfonta.github.io/conflict-chat/' },
         { title: 'Hand Physics Lab', description: 'A hand and face tracking simulation in 3D.', link: 'https://gantyfonta.github.io/HandPhysicsLab/' },
         { title: 'Grak the AI Caveman (newest)', description: 'Chat with Grak, a caveman AI.', link: 'https://preview--aura-chat-copy-255598c1.base44.app/Chat?hide_badge=true' },
@@ -79,6 +76,13 @@
         { title: 'Moinkcraft', description: 'A WIP 2D sandbox game about pigs.', link: 'https://gantyfonta.github.io/OOCJRouge/' },
       ];
 
+      const familiarSites = [
+        { title: 'Sprootgle Docs', description: 'A very familiar seeming document program.', link: 'https://sproot-docs.base44.app' },
+        { title: 'Sprootify', description: 'A music app for all your music needs.', link: 'https://vibefy.base44.app/' },
+        { title: 'Conflict', description: 'A simple messaging app that looks familiar.', link: 'https://gantyfonta.github.io/conflict/' },
+        
+        ];
+      
       // -------------------- COMPONENTS --------------------
       const Card = ({ data, buttonText = 'Open' }) => (
         <div className="bg-[#0f1726] p-4 rounded-xl text-center transition-all duration-200 hover:scale-105 flex flex-col justify-between">
@@ -148,6 +152,7 @@
                   {tab === 'games' && 'Random Games'}
                   {tab === 'misc' && 'Miscellaneous'}
                   {tab === 'oink' && "Oink O' Stuff"}
+                  {tab === 'familiar' && "Oddly Familiar Websites"}
                 </button>
               ))}
             </div>
@@ -157,6 +162,7 @@
               {activeTab === 'games' && <section className="grid grid-cols-1 md:grid-cols-3 gap-4">{filterData(randomGames).map(p => <Card key={p.title} data={p} buttonText="Play" />)}</section>}
               {activeTab === 'misc' && <section className="grid grid-cols-1 md:grid-cols-3 gap-4">{filterData(miscProjects).map(p => <Card key={p.title} data={p} />)}</section>}
               {activeTab === 'oink' && <section className="grid grid-cols-1 md:grid-cols-3 gap-4">{filterData(oinkStuff).map(p => <Card key={p.title} data={p} />)}</section>}
+              {activeTab === 'familiar' && <section className="grid grid-cols-1 md:grid-cols-3 gap-4">{filterData(familiarSites).map(p => <Card key={p.title} data={p} />)}</section>}
             </main>
           </div>
         );
