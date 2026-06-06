@@ -3,62 +3,83 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GantyFonta:~/$</title>
+    <title>Ganty's Lemonade Stand</title>
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Fira Code is the gold standard for terminal/coding fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
       body { 
-        font-family: 'Fira Code', monospace; 
-        background-color: #050505; /* Deep terminal black */
-        color: #39ff14; /* Classic terminal neon green */
+        font-family: 'Fredoka', sans-serif; 
+        background-color: #FFFDE7; /* Very light sunny yellow */
+        color: #4E342E; /* Dark wood brown */
       }
       
-      /* Terminal Cursor Animation */
-      .cursor-blink {
-        animation: blink 1s step-end infinite;
+      /* The classic stand awning */
+      .awning {
+        height: 60px;
+        background: repeating-linear-gradient(
+          to right,
+          #FDE047, /* Tailwind yellow-300 */
+          #FDE047 60px,
+          #FFFFFF 60px,
+          #FFFFFF 120px
+        );
+        box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+        border-bottom: 4px solid #EAB308; /* Tailwind yellow-500 */
+        position: relative;
       }
-      @keyframes blink {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0; }
+      
+      /* Scalloped edge effect for the awning */
+      .awning::after {
+        content: "";
+        position: absolute;
+        bottom: -15px;
+        left: 0;
+        right: 0;
+        height: 15px;
+        background-image: radial-gradient(circle at 30px 0, transparent 30px, #FFFDE7 31px);
+        background-size: 60px 15px;
+        background-position: 0 0;
       }
 
-      /* CRT Scanline Effect Overlay */
-      .scanlines {
-        position: fixed;
-        top: 0; left: 0; width: 100vw; height: 100vh;
-        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-        background-size: 100% 4px, 3px 100%;
-        pointer-events: none;
-        z-index: 50;
+      /* Chalkboard menu styling */
+      .chalkboard {
+        background-color: #2E4C3D; /* Deep chalkboard green */
+        color: #F8FAFC;
+        border: 12px solid #8B5A2B; /* Wood frame */
+        border-radius: 8px;
+        box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 10px 20px rgba(0,0,0,0.1);
       }
 
-      /* Custom scrollbar */
-      ::-webkit-scrollbar { width: 8px; }
-      ::-webkit-scrollbar-track { background: #050505; border-left: 1px solid #1a3311; }
-      ::-webkit-scrollbar-thumb { background: #1a3311; }
-      ::-webkit-scrollbar-thumb:hover { background: #39ff14; }
+      /* Smooth scrolling */
+      html { scroll-behavior: smooth; }
+      
+      /* Custom scrollbar to match the theme */
+      ::-webkit-scrollbar { width: 10px; }
+      ::-webkit-scrollbar-track { background: #FFFDE7; }
+      ::-webkit-scrollbar-thumb { background: #FDE047; border-radius: 10px; }
+      ::-webkit-scrollbar-thumb:hover { background: #EAB308; }
     </style>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   </head>
-  <body class="antialiased selection:bg-[#39ff14] selection:text-black">
-    <div class="scanlines"></div>
-    <div id="root"></div>
+  <body class="antialiased selection:bg-yellow-300 selection:text-amber-900 min-h-screen flex flex-col">
+    <div class="awning w-full z-50 fixed top-0 left-0"></div>
+    
+    <div id="root" class="pt-20 flex-1"></div>
 
     <script type="text/babel">
-      const { useState, useEffect } = React;
+      const { useState } = React;
 
       // -----------------------------------------------------------------
-      // DATA CONFIGURATION (With Blackjack syntax error fixed!)
+      // DATA CONFIGURATION
       // -----------------------------------------------------------------
       const projectData = {
         school: {
-          name: 'School Projects', cmd: 'SCHOOL.proj', actionText: 'execute',
+          name: 'Brain Juice', icon: '🧠', actionText: 'Drink Up',
           items: [
             { title: 'Latin Dictionary WIP', description: 'Latin dictionary for all your latin dictionary needs!', link: 'https://gantyfonta.github.io/LD/' },
             { title: 'Significant Figures Calculator', description: 'Do math with rounding and automatic SF handling.', link: 'https://gantyfonta.github.io/SigFigCalc/' },
@@ -69,7 +90,7 @@
           ]
         },
         games: {
-          name: 'Random Games', cmd: 'GAMES.exe', actionText: 'play',
+          name: 'Game Punch', icon: '🕹️', actionText: 'Play',
           items: [
             { title: 'Boxy', description: 'Stack boxes and use poweful tools to make $$$.', link: 'https://gantyfonta.github.io/Boxy/' },
             { title: 'Brawl Star', description: 'Brawl stars dont sue me please.', link: 'https://gantyfonta.github.io/brawl/' },
@@ -98,7 +119,7 @@
           ]
         },
         misc: {
-          name: 'Miscellaneous', cmd: 'MISC.opus', actionText: 'init',
+          name: 'Mystery Mix', icon: '🌀', actionText: 'Explore',
           items: [
             { title: 'Conflict Rooms', description: 'A room based meeting site that works like Zoom and looks like Conflict.', link: 'https://gantyfonta.github.io/conflict-chat/' },
             { title: 'Hand Physics Lab', description: 'A hand and face tracking simulation in 3D.', link: 'https://gantyfonta.github.io/HandPhysicsLab/' },
@@ -113,7 +134,7 @@
           ]
         },
         oink: {
-          name: "Oink O' Stuff", cmd: 'OINK.bin', actionText: 'launch',
+          name: "Oink O' Stuff", icon: '🐷', actionText: 'Launch',
           items: [
             { title: 'Oink-O-Clock Jump', description: 'The single greatest game ever made.', link: 'https://gantyfonta.github.io/oinkoclockjump/' },
             { title: 'OOCJ Battles', description: 'Two players. See whos the best.', link: 'https://gantyfonta.github.io/OOCJBattles/' },
@@ -121,7 +142,7 @@
           ]
         },
         familiar: {
-          name: 'Oddly Familiar', cmd: 'FAMILIAR.sys', actionText: 'connect',
+          name: 'Oddly Familiar', icon: '👁️', actionText: 'Visit',
           items: [
             { title: 'Sprootgle Docs', description: 'A very familiar seeming document program.', link: 'https://sproot-docs.base44.app' },
             { title: 'Sprootify', description: 'A music app for all your music needs.', link: 'https://vibefy.base44.app/' },
@@ -131,9 +152,32 @@
       };
 
       // -------------------- COMPONENTS --------------------
-      
-      const PromptPrefix = () => (
-        <span className="text-white mr-2">GantyFonta:~/$</span>
+
+      // The individual project card (looks like a cute sticker/sign)
+      const MenuCard = ({ data, buttonText, icon }) => (
+        <a 
+          href={data.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group block bg-white rounded-3xl p-6 border-4 border-amber-900/10 hover:border-yellow-400 hover:shadow-[0_8px_0_rgba(250,204,21,1)] hover:-translate-y-2 transition-all duration-200 relative overflow-hidden"
+        >
+          {/* Decorative Lemon Wedge Corner */}
+          <div className="absolute -top-6 -right-6 w-20 h-20 bg-yellow-300 rounded-full opacity-20 group-hover:scale-150 transition-transform duration-500"></div>
+
+          <div className="flex justify-between items-start mb-3 relative z-10">
+            <h3 className="text-xl font-bold text-amber-900 group-hover:text-yellow-600 transition-colors leading-tight pr-2">
+              {data.title}
+            </h3>
+            <span className="text-2xl drop-shadow-sm">{icon}</span>
+          </div>
+          <p className="text-base text-amber-900/70 leading-relaxed mb-6 h-12 line-clamp-2 relative z-10 font-medium">
+            {data.description}
+          </p>
+          <div className="flex items-center text-lg font-bold text-yellow-600 relative z-10">
+            {buttonText} 
+            <span className="ml-2 transform group-hover:translate-x-1 transition-transform">→</span>
+          </div>
+        </a>
       );
 
       // -------------------- MAIN APP --------------------
@@ -141,17 +185,10 @@
         const categories = Object.keys(projectData);
         const [activeTab, setActiveTab] = useState(categories[0]);
         const [searchQuery, setSearchQuery] = useState('');
-        const [loginTime, setLoginTime] = useState('');
-
-        // Set realistic login time on mount
-        useEffect(() => {
-          setLoginTime(new Date().toUTCString());
-        }, []);
 
         const handleSearchChange = (e) => {
           const value = e.target.value;
           setSearchQuery(value);
-          // Easter eggs preserved
           if (value.toLowerCase() === 'bird') window.location.href = 'bird.html';
           if (value.toLowerCase() === 'jump') window.location.href = 'jump.html';
         };
@@ -163,21 +200,33 @@
         );
 
         return (
-          <div className="min-h-screen flex flex-col p-4 md:p-8 max-w-5xl mx-auto text-[13px] sm:text-[15px] leading-relaxed">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex flex-col items-center">
             
-            {/* TERMINAL HEADER */}
-            <div className="mb-6 text-[#1a5a14] font-semibold">
-              <p>Last login: {loginTime} on console</p>
-              <p>GantyOS v2.4.1 (Archive Edition) - type 'help' for support.</p>
+            {/* HERO / SIGN SECTION */}
+            <div className="text-center mb-12 relative">
+              <div className="inline-block relative">
+                {/* Wood posts holding the sign */}
+                <div className="absolute -top-12 left-8 w-4 h-20 bg-amber-800 rounded-t-sm -z-10"></div>
+                <div className="absolute -top-12 right-8 w-4 h-20 bg-amber-800 rounded-t-sm -z-10"></div>
+                
+                {/* The main sign */}
+                <div className="bg-yellow-400 border-8 border-amber-800 rounded-2xl px-10 py-6 shadow-xl transform -rotate-2">
+                  <h1 className="text-5xl md:text-6xl font-bold text-amber-900 drop-shadow-md">
+                    Ganty's Stand 🍋
+                  </h1>
+                  <p className="text-xl text-amber-800 mt-2 font-semibold">Ice cold code & fresh projects.</p>
+                </div>
+              </div>
             </div>
 
-            {/* DIRECTORY LISTING (Navigation) */}
-            <div className="mb-8">
-              <div className="flex items-center mb-2">
-                <PromptPrefix />
-                <span className="text-[#0ff]">ls -la ./categories</span>
-              </div>
-              <div className="flex flex-wrap gap-x-6 gap-y-3 pl-4">
+            {/* CHALKBOARD MENU & SEARCH */}
+            <div className="w-full max-w-4xl chalkboard p-8 mb-12 flex flex-col md:flex-row items-center justify-between gap-6">
+              
+              {/* Flavor Selector (Tabs) */}
+              <div className="flex flex-wrap justify-center gap-3 w-full md:w-auto">
+                <span className="w-full text-center md:text-left text-yellow-300 font-bold text-xl mb-1 tracking-wide" style={{fontFamily: "'Comic Sans MS', cursive, sans-serif"}}>
+                  Pick a Flavor:
+                </span>
                 {categories.map(key => {
                   const cat = projectData[key];
                   const isActive = activeTab === key;
@@ -185,81 +234,59 @@
                     <button
                       key={key}
                       onClick={() => { setActiveTab(key); setSearchQuery(''); }}
-                      className={`transition-colors text-left group flex items-center ${isActive ? 'text-yellow-400' : 'text-[#39ff14] hover:text-white'}`}
+                      className={`px-4 py-2 rounded-xl text-lg font-bold transition-all ${
+                        isActive
+                          ? 'bg-yellow-400 text-amber-900 transform scale-105 shadow-md'
+                          : 'bg-white/10 text-white hover:bg-white/20'
+                      }`}
                     >
-                      <span className="mr-2 opacity-50 group-hover:opacity-100">drwxr-xr-x</span>
-                      <span>[{cat.cmd}]</span>
+                      {cat.icon} {cat.name}
                     </button>
                   );
                 })}
               </div>
-            </div>
 
-            {/* COMMAND EXECUTION & OUTPUT */}
-            <div className="mb-8 flex-1">
-              {/* Command typed */}
-              <div className="flex items-center mb-3">
-                <PromptPrefix />
-                <span className="text-[#0ff]">./run {currentCategory.cmd}</span>
-              </div>
-
-              {/* Output Header */}
-              <div className="pl-4 border-l border-[#1a3311] ml-2">
-                <div className="text-gray-400 mb-4">
-                  Loading module '{currentCategory.name}'... OK.<br/>
-                  Found {currentCategory.items.length} records.
-                </div>
-
-                {/* GREP / SEARCH INPUT */}
-                <div className="flex items-center gap-3 mb-6 bg-[#0a1105] p-2 inline-flex border border-[#1a3311]">
-                  <span className="text-yellow-400">grep</span>
-                  <input
-                    type="text"
-                    className="bg-transparent border-none outline-none text-white w-48 sm:w-64 placeholder-[#1a3311]"
-                    placeholder='"search filter"'
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    spellCheck="false"
-                  />
-                  {searchQuery && <span className="text-gray-500 text-xs">| {filteredItems.length} match(es)</span>}
-                </div>
-
-                {/* PROJECTS LIST */}
-                <div className="space-y-4">
-                  {filteredItems.length > 0 ? (
-                    filteredItems.map((item, idx) => (
-                      <div key={idx} className="flex flex-col sm:flex-row sm:items-start group">
-                        <div className="flex-1 pr-4">
-                          <span className="text-gray-500 mr-2">[{String(idx + 1).padStart(2, '0')}]</span>
-                          <span className="text-white font-bold">{item.title}</span>
-                          <span className="text-gray-400 ml-2 block sm:inline mt-1 sm:mt-0">
-                            // {item.description}
-                          </span>
-                        </div>
-                        <a
-                          href={item.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="mt-2 sm:mt-0 text-[#0ff] opacity-80 hover:opacity-100 hover:text-yellow-400 transition-colors whitespace-nowrap before:content-['>_'] before:mr-1"
-                        >
-                          {currentCategory.actionText.toUpperCase()}
-                        </a>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-red-500">
-                      Error: No files matching "{searchQuery}" in directory ./categories/{currentCategory.cmd}
-                    </div>
-                  )}
-                </div>
+              {/* Search Box (Tip Jar) */}
+              <div className="w-full md:w-72 relative">
+                <span className="block text-yellow-300 font-bold text-xl mb-2 tracking-wide" style={{fontFamily: "'Comic Sans MS', cursive, sans-serif"}}>
+                  Search:
+                </span>
+                <input
+                  type="text"
+                  className="w-full bg-white/10 border-2 border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:border-yellow-400 focus:bg-white/20 transition-all font-medium text-lg"
+                  placeholder="Find a drink..."
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                />
               </div>
             </div>
 
-            {/* WAITING PROMPT */}
-            <div className="flex items-center pb-8 mt-auto">
-              <PromptPrefix />
-              <span className="w-2.5 h-5 bg-[#39ff14] cursor-blink"></span>
-            </div>
+            {/* DRINK SAMPLES (PROJECT GRID) */}
+            <main className="w-full max-w-6xl">
+              {filteredItems.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {filteredItems.map((project, idx) => (
+                    <MenuCard 
+                      key={idx} 
+                      data={project} 
+                      buttonText={currentCategory.actionText} 
+                      icon={currentCategory.icon}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="py-20 text-center bg-white/50 rounded-3xl border-4 border-dashed border-amber-900/20 max-w-2xl mx-auto">
+                  <div className="text-6xl mb-4 grayscale opacity-50">🍋</div>
+                  <h3 className="text-2xl font-bold text-amber-900 mb-2">We're all out!</h3>
+                  <p className="text-lg text-amber-800/70">No projects match "{searchQuery}". Try another flavor.</p>
+                </div>
+              )}
+            </main>
+
+            {/* WOODEN FOOTER */}
+            <footer className="mt-20 w-full text-center border-t-4 border-amber-900/10 pt-8 pb-4">
+              <p className="text-amber-800/60 font-bold">© 2026 GantyFonta. All lemons squeezed locally.</p>
+            </footer>
 
           </div>
         );
