@@ -3,46 +3,62 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ganty's Project Archive // Matrix v1.0</title>
+    <title>GantyFonta:~/$</title>
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Fira Code is the gold standard for terminal/coding fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-      body { font-family: 'Inter', sans-serif; }
-      .mono { font-family: 'Fira Code', monospace; }
+      body { 
+        font-family: 'Fira Code', monospace; 
+        background-color: #050505; /* Deep terminal black */
+        color: #39ff14; /* Classic terminal neon green */
+      }
       
-      /* Subtle grid background overlay for the matrix look */
-      .matrix-grid {
-        background-color: #0c111e;
-        background-image: 
-          linear-gradient(#1a202c 1px, transparent 1px),
-          linear-gradient(90deg, #1a202c 1px, transparent 1px);
-        background-size: 20px 20px;
-        background-position: center;
+      /* Terminal Cursor Animation */
+      .cursor-blink {
+        animation: blink 1s step-end infinite;
+      }
+      @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
       }
 
-      /* Consistent square aspect ratio for tiles */
-      .matrix-tile { aspect-ratio: 1 / 1; }
+      /* CRT Scanline Effect Overlay */
+      .scanlines {
+        position: fixed;
+        top: 0; left: 0; width: 100vw; height: 100vh;
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+        background-size: 100% 4px, 3px 100%;
+        pointer-events: none;
+        z-index: 50;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar { width: 8px; }
+      ::-webkit-scrollbar-track { background: #050505; border-left: 1px solid #1a3311; }
+      ::-webkit-scrollbar-thumb { background: #1a3311; }
+      ::-webkit-scrollbar-thumb:hover { background: #39ff14; }
     </style>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   </head>
-  <body class="matrix-grid text-[#e2e8f0] min-h-screen relative antialiased">
+  <body class="antialiased selection:bg-[#39ff14] selection:text-black">
+    <div class="scanlines"></div>
     <div id="root"></div>
 
     <script type="text/babel">
-      const { useState, useMemo } = React;
+      const { useState, useEffect } = React;
 
       // -----------------------------------------------------------------
-      // DATA CONFIGURATION
-      // Adding a new project still works exactly the same way here!
+      // DATA CONFIGURATION (With Blackjack syntax error fixed!)
       // -----------------------------------------------------------------
       const projectData = {
         school: {
-          name: 'School Projects', icon: '🎓', actionText: 'Open', color: 'yellow',
+          name: 'School Projects', cmd: 'SCHOOL.proj', actionText: 'execute',
           items: [
             { title: 'Latin Dictionary WIP', description: 'Latin dictionary for all your latin dictionary needs!', link: 'https://gantyfonta.github.io/LD/' },
             { title: 'Significant Figures Calculator', description: 'Do math with rounding and automatic SF handling.', link: 'https://gantyfonta.github.io/SigFigCalc/' },
@@ -53,7 +69,7 @@
           ]
         },
         games: {
-          name: 'Random Games', icon: '🎮', actionText: 'Play', color: 'sky',
+          name: 'Random Games', cmd: 'GAMES.exe', actionText: 'play',
           items: [
             { title: 'Boxy', description: 'Stack boxes and use poweful tools to make $$$.', link: 'https://gantyfonta.github.io/Boxy/' },
             { title: 'Brawl Star', description: 'Brawl stars dont sue me please.', link: 'https://gantyfonta.github.io/brawl/' },
@@ -82,11 +98,11 @@
           ]
         },
         misc: {
-          name: 'Miscellaneous', icon: '⚡', actionText: 'Open', color: 'emerald',
+          name: 'Miscellaneous', cmd: 'MISC.opus', actionText: 'init',
           items: [
             { title: 'Conflict Rooms', description: 'A room based meeting site that works like Zoom and looks like Conflict.', link: 'https://gantyfonta.github.io/conflict-chat/' },
             { title: 'Hand Physics Lab', description: 'A hand and face tracking simulation in 3D.', link: 'https://gantyfonta.github.io/HandPhysicsLab/' },
-            { title: 'Grak Caveman (newest)', description: 'Chat with Grak, a caveman AI.', link: 'https://preview--aura-chat-copy-255598c1.base44.app/Chat?hide_badge=true' },
+            { title: 'Grak the AI Caveman', description: 'Chat with Grak, a caveman AI.', link: 'https://preview--aura-chat-copy-255598c1.base44.app/Chat?hide_badge=true' },
             { title: 'Synthesizer', description: 'Make music.', link: 'https://gantyfonta.github.io/synthesizer/' },
             { title: 'Robert the AI', description: 'Talk to the ultimate codemaking British AI.', link: 'https://robert.base44.app' },
             { title: 'GantyMail', description: 'Another email(chat) system to talk to people.', link: 'https://gantyfonta.github.io/gantymail/' },
@@ -97,7 +113,7 @@
           ]
         },
         oink: {
-          name: "Oink O' Stuff", icon: '🐷', actionText: 'Launch', color: 'rose',
+          name: "Oink O' Stuff", cmd: 'OINK.bin', actionText: 'launch',
           items: [
             { title: 'Oink-O-Clock Jump', description: 'The single greatest game ever made.', link: 'https://gantyfonta.github.io/oinkoclockjump/' },
             { title: 'OOCJ Battles', description: 'Two players. See whos the best.', link: 'https://gantyfonta.github.io/OOCJBattles/' },
@@ -105,7 +121,7 @@
           ]
         },
         familiar: {
-          name: 'Oddly Familiar', icon: '👁️', actionText: 'Visit', color: 'violet',
+          name: 'Oddly Familiar', cmd: 'FAMILIAR.sys', actionText: 'connect',
           items: [
             { title: 'Sprootgle Docs', description: 'A very familiar seeming document program.', link: 'https://sproot-docs.base44.app' },
             { title: 'Sprootify', description: 'A music app for all your music needs.', link: 'https://vibefy.base44.app/' },
@@ -114,173 +130,137 @@
         }
       };
 
-      // Utility function to generate a 2-letter symbol from project title
-      // E.g., Latin Dictionary -> Ld, Boxy -> Bo, Grak AI -> Gk
-      const generateSymbol = (title) => {
-        const words = title.trim().split(' ');
-        if (words.length >= 2) {
-          return words[0][0].toUpperCase() + words[1][0].toLowerCase();
-        } else {
-          // If only one word, return first two letters, capitalizing first.
-          return words[0][0].toUpperCase() + words[0][1].toLowerCase();
-        }
-      };
-
       // -------------------- COMPONENTS --------------------
-
-      const DetailsPanel = ({ project, onClose }) => {
-        if (!project) return null;
-
-        const colorMap = {
-          yellow: 'border-yellow-500 text-yellow-300',
-          sky: 'border-sky-500 text-sky-300',
-          emerald: 'border-emerald-500 text-emerald-300',
-          rose: 'border-rose-500 text-rose-300',
-          violet: 'border-violet-500 text-violet-300',
-        };
-
-        const currentStyle = colorMap[project.categoryColor];
-
-        return (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
-            <div className={`bg-[#1a202c] border-2 ${currentStyle.split(' ')[0]} rounded-2xl w-full max-w-lg p-8 shadow-2xl relative transition-all`}>
-              <button onClick={onClose} className="absolute top-4 right-5 text-gray-500 hover:text-white text-3xl font-mono">×</button>
-              
-              <div className="flex items-center gap-4 mb-6">
-                <span className="text-5xl mono font-bold bg-gray-900 px-5 py-3 rounded-xl shadow-inner">{project.symbol}</span>
-                <div>
-                  <h2 className="text-2xl font-bold text-white tracking-tight">{project.data.title}</h2>
-                  <p className={`text-sm ${currentStyle.split(' ')[1]} font-medium`}>{project.categoryName}</p>
-                </div>
-              </div>
-              
-              <p className="text-gray-300 mb-8 leading-relaxed text-base">{project.data.description}</p>
-              
-              <a
-                href={project.data.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`w-full text-center py-3.5 rounded-xl bg-gradient-to-r from-${project.categoryColor}-600 to-${project.categoryColor}-500 text-white text-base font-bold shadow-md hover:scale-[1.03] transition-all block tracking-wide`}
-              >
-                {project.actionText} Project Now →
-              </a>
-            </div>
-          </div>
-        );
-      };
-
-      // Matrix Tile Component
-      const Tile = ({ symbol, title, colorTheme, onClick }) => {
-        const themeStyles = {
-          yellow: 'border-yellow-900/50 hover:border-yellow-400 bg-yellow-950/20 text-yellow-300 hover:shadow-[0_0_15px_rgba(250,204,21,0.2)] hover:scale-105',
-          sky: 'border-sky-900/50 hover:border-sky-400 bg-sky-950/20 text-sky-300 hover:shadow-[0_0_15px_rgba(56,189,248,0.2)] hover:scale-105',
-          emerald: 'border-emerald-900/50 hover:border-emerald-400 bg-emerald-950/20 text-emerald-300 hover:shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:scale-105',
-          rose: 'border-rose-900/50 hover:border-rose-400 bg-rose-950/20 text-rose-300 hover:shadow-[0_0_15px_rgba(244,63,94,0.2)] hover:scale-105',
-          violet: 'border-violet-900/50 hover:border-violet-400 bg-violet-950/20 text-violet-300 hover:shadow-[0_0_15px_rgba(139,92,246,0.2)] hover:scale-105',
-        };
-
-        return (
-          <button
-            onClick={onClick}
-            className={`matrix-tile flex flex-col justify-center items-center border border-dashed rounded-lg p-3 text-center transition-all duration-300 relative group overflow-hidden ${themeStyles[colorTheme]}`}
-            title={title}
-          >
-            <span className="mono text-2xl font-bold tracking-tight absolute inset-0 flex items-center justify-center opacity-100 group-hover:opacity-10 transition-opacity">
-              {symbol}
-            </span>
-            <span className="text-xs font-semibold leading-tight text-white line-clamp-2 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity px-1">
-              {title}
-            </span>
-          </button>
-        );
-      };
+      
+      const PromptPrefix = () => (
+        <span className="text-white mr-2">GantyFonta:~/$</span>
+      );
 
       // -------------------- MAIN APP --------------------
       const App = () => {
         const categories = Object.keys(projectData);
+        const [activeTab, setActiveTab] = useState(categories[0]);
         const [searchQuery, setSearchQuery] = useState('');
-        const [selectedProject, setSelectedProject] = useState(null);
+        const [loginTime, setLoginTime] = useState('');
 
-        // Pre-process all project data for the matrix grid
-        // Memoized for performance, especially with 40+ items
-        const processedMatrix = useMemo(() => {
-          return categories.flatMap(catKey => {
-            const cat = projectData[catKey];
-            return cat.items
-              .filter(item =>
-                !searchQuery ||
-                item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                item.description.toLowerCase().includes(searchQuery.toLowerCase())
-              )
-              .map(item => ({
-                id: `${catKey}-${item.title}`,
-                categoryKey: catKey,
-                categoryColor: cat.color,
-                categoryName: cat.name,
-                actionText: cat.actionText,
-                symbol: generateSymbol(item.title),
-                data: item
-              }));
-          });
-        }, [searchQuery]);
+        // Set realistic login time on mount
+        useEffect(() => {
+          setLoginTime(new Date().toUTCString());
+        }, []);
 
         const handleSearchChange = (e) => {
           const value = e.target.value;
           setSearchQuery(value);
-          // Original easter eggs preserved
+          // Easter eggs preserved
           if (value.toLowerCase() === 'bird') window.location.href = 'bird.html';
           if (value.toLowerCase() === 'jump') window.location.href = 'jump.html';
         };
 
+        const currentCategory = projectData[activeTab];
+        const filteredItems = currentCategory.items.filter(item =>
+          item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.description.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+
         return (
-          <div className="flex flex-col relative z-10 px-6 py-8">
+          <div className="min-h-screen flex flex-col p-4 md:p-8 max-w-5xl mx-auto text-[13px] sm:text-[15px] leading-relaxed">
             
-            <header className="mb-12 flex flex-col items-center text-center">
-              <h1 className="text-3xl font-bold tracking-tight text-white mb-2">PROJECT ARCHIVE // MATRIX v1.0</h1>
-              <p className="text-gray-400 text-sm max-w-xl mb-6 leading-relaxed">
-                A data-dense visualization of GantyFonta’s diverse software experiments, organized like the elements.
-                Select a visual block to view description.
-              </p>
-              
-              <div className="relative w-full max-w-sm">
-                <input
-                  type="text"
-                  className="w-full pl-6 pr-10 py-3 rounded-full bg-gray-900 border border-gray-700 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-sky-500 transition-all font-mono shadow-inner"
-                  placeholder="FILTER MATRIX [INPUT]..."
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                />
-                <span className="absolute inset-y-0 right-4 flex items-center pr-1 text-gray-600">🔍</span>
+            {/* TERMINAL HEADER */}
+            <div className="mb-6 text-[#1a5a14] font-semibold">
+              <p>Last login: {loginTime} on console</p>
+              <p>GantyOS v2.4.1 (Archive Edition) - type 'help' for support.</p>
+            </div>
+
+            {/* DIRECTORY LISTING (Navigation) */}
+            <div className="mb-8">
+              <div className="flex items-center mb-2">
+                <PromptPrefix />
+                <span className="text-[#0ff]">ls -la ./categories</span>
               </div>
-            </header>
+              <div className="flex flex-wrap gap-x-6 gap-y-3 pl-4">
+                {categories.map(key => {
+                  const cat = projectData[key];
+                  const isActive = activeTab === key;
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => { setActiveTab(key); setSearchQuery(''); }}
+                      className={`transition-colors text-left group flex items-center ${isActive ? 'text-yellow-400' : 'text-[#39ff14] hover:text-white'}`}
+                    >
+                      <span className="mr-2 opacity-50 group-hover:opacity-100">drwxr-xr-x</span>
+                      <span>[{cat.cmd}]</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
-            <main className="flex-1 max-w-[1200px] mx-auto w-full mb-16">
-              {processedMatrix.length > 0 ? (
-                <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 gap-3.5 md:gap-4 auto-rows-min grid-dense">
-                  {processedMatrix.map(proj => (
-                    <Tile
-                      key={proj.id}
-                      symbol={proj.symbol}
-                      title={proj.data.title}
-                      colorTheme={proj.categoryColor}
-                      onClick={() => setSelectedProject(proj)}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-20 text-center border-2 border-dashed border-gray-700 rounded-3xl bg-gray-950/20">
-                  <span className="text-5xl mb-5">👾</span>
-                  <h3 className="text-xl font-bold text-white">SEARCH ERROR // NO DATA RETURNED</h3>
-                  <p className="text-gray-500 mt-2 font-mono text-sm">Target string "{searchQuery}" not found in matrix parameters.</p>
-                </div>
-              )}
-            </main>
-            
-            <footer className="text-center font-mono text-xs text-gray-700 mt-12 pb-6 border-t border-gray-900 pt-6">
-              END TRANSMISSION // GANTYFONTA LABS // Built with React + Tailwind (CDN).
-            </footer>
+            {/* COMMAND EXECUTION & OUTPUT */}
+            <div className="mb-8 flex-1">
+              {/* Command typed */}
+              <div className="flex items-center mb-3">
+                <PromptPrefix />
+                <span className="text-[#0ff]">./run {currentCategory.cmd}</span>
+              </div>
 
-            <DetailsPanel project={selectedProject} onClose={() => setSelectedProject(null)} />
+              {/* Output Header */}
+              <div className="pl-4 border-l border-[#1a3311] ml-2">
+                <div className="text-gray-400 mb-4">
+                  Loading module '{currentCategory.name}'... OK.<br/>
+                  Found {currentCategory.items.length} records.
+                </div>
+
+                {/* GREP / SEARCH INPUT */}
+                <div className="flex items-center gap-3 mb-6 bg-[#0a1105] p-2 inline-flex border border-[#1a3311]">
+                  <span className="text-yellow-400">grep</span>
+                  <input
+                    type="text"
+                    className="bg-transparent border-none outline-none text-white w-48 sm:w-64 placeholder-[#1a3311]"
+                    placeholder='"search filter"'
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    spellCheck="false"
+                  />
+                  {searchQuery && <span className="text-gray-500 text-xs">| {filteredItems.length} match(es)</span>}
+                </div>
+
+                {/* PROJECTS LIST */}
+                <div className="space-y-4">
+                  {filteredItems.length > 0 ? (
+                    filteredItems.map((item, idx) => (
+                      <div key={idx} className="flex flex-col sm:flex-row sm:items-start group">
+                        <div className="flex-1 pr-4">
+                          <span className="text-gray-500 mr-2">[{String(idx + 1).padStart(2, '0')}]</span>
+                          <span className="text-white font-bold">{item.title}</span>
+                          <span className="text-gray-400 ml-2 block sm:inline mt-1 sm:mt-0">
+                            // {item.description}
+                          </span>
+                        </div>
+                        <a
+                          href={item.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-2 sm:mt-0 text-[#0ff] opacity-80 hover:opacity-100 hover:text-yellow-400 transition-colors whitespace-nowrap before:content-['>_'] before:mr-1"
+                        >
+                          {currentCategory.actionText.toUpperCase()}
+                        </a>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-red-500">
+                      Error: No files matching "{searchQuery}" in directory ./categories/{currentCategory.cmd}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* WAITING PROMPT */}
+            <div className="flex items-center pb-8 mt-auto">
+              <PromptPrefix />
+              <span className="w-2.5 h-5 bg-[#39ff14] cursor-blink"></span>
+            </div>
+
           </div>
         );
       };
