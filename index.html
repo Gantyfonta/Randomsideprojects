@@ -3,345 +3,239 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The Adventurer's Guild - Quest Board</title>
+    <title>Random Side Projects | Database</title>
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=MedievalSharp&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-      body {
-        font-family: 'Cinzel', serif;
-        background-color: #0e0a07;
-        background-image: 
-          radial-gradient(circle at 50% 20%, rgba(180, 83, 9, 0.15) 0%, transparent 60%),
-          radial-gradient(circle at 80% 80%, rgba(120, 53, 15, 0.1) 0%, transparent 50%);
-        color: #f1e5d1;
+      body { 
+        font-family: 'Inter', sans-serif; 
+        background-color: #191919; 
+        color: #D4D4D4; 
       }
-
-      .medieval-title {
-        font-family: 'MedievalSharp', cursive;
-      }
-
-      .mono-text {
-        font-family: 'Share Tech Mono', monospace;
-      }
-
-      /* Tavern Wood Panel Visual Effect */
-      .wood-panel {
-        background: #1c130d;
-        background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(0, 0, 0, 0.3) 100%),
-                          repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(0,0,0,0.15) 40px, rgba(0,0,0,0.15) 41px);
-        box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.9), 0 15px 35px rgba(0, 0, 0, 0.8);
-      }
-
-      /* Parchment Card Styling */
-      .parchment-card {
-        background: #ebd2ad;
-        background-image: radial-gradient(circle at 50% 50%, #f4e4bc 0%, #d8b884 100%);
-        color: #2b1810;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.6), inset 0 0 15px rgba(139, 69, 19, 0.3);
-        border: 2px solid #b38e58;
-      }
-
-      .parchment-card:hover {
-        box-shadow: 0 15px 30px rgba(234, 179, 8, 0.25), inset 0 0 20px rgba(139, 69, 19, 0.2);
-      }
-
-      /* Wax Seal Effect */
-      .wax-seal {
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5), inset 0 -3px 6px rgba(0, 0, 0, 0.4), inset 0 3px 6px rgba(255, 255, 255, 0.3);
-      }
-
-      html { scroll-behavior: smooth; }
-
-      ::-webkit-scrollbar { width: 10px; }
-      ::-webkit-scrollbar-track { background: #120b07; }
-      ::-webkit-scrollbar-thumb { background: #5c3a21; border-radius: 5px; border: 1px solid #2b1810; }
-      ::-webkit-scrollbar-thumb:hover { background: #825331; }
+      /* Clean, minimal scrollbar */
+      ::-webkit-scrollbar { width: 8px; height: 8px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: #555; }
     </style>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   </head>
-  <body class="antialiased selection:bg-amber-700 selection:text-amber-100 min-h-screen py-8">
+  <body class="antialiased selection:bg-[#2e2e2e] selection:text-white text-[15px]">
     <div id="root"></div>
 
     <script type="text/babel">
       const { useState } = React;
 
       // -----------------------------------------------------------------
-      // QUEST DATA CATALOG WITH RPG METADATA
+      // DATA CONFIGURATION
+      // Same exact setup! Just add to these arrays and the tables build themselves.
       // -----------------------------------------------------------------
-      const questCatalog = [
-        // SAGE SCROLLS (School)
-        { id: 'S1', title: 'Latin Dictionary WIP', description: 'Latin dictionary for all your latin dictionary needs!', link: 'https://gantyfonta.github.io/LD/', category: 'sage', categoryName: 'Sage Scrolls', rank: 'B', reward: '450 Gold • +50 Wisdom', icon: '📜' },
-        { id: 'S2', title: 'Significant Figures Calc', description: 'Do math with rounding and automatic SF handling.', link: 'https://gantyfonta.github.io/SigFigCalc/', category: 'sage', categoryName: 'Sage Scrolls', rank: 'C', reward: '200 Gold • Alchemy Skill', icon: '📐' },
-        { id: 'S3', title: 'Latin AI Guildmaster', description: 'Ask for help to an AI chatbot.', link: 'https://latinusmagister.base44.app/', category: 'sage', categoryName: 'Sage Scrolls', rank: 'A', reward: '900 Gold • Arcane Tome', icon: '🤖' },
-        { id: 'S4', title: 'Outlet Flashcard Grimoire', description: 'Paste in flashcards or vocab words and study them.', link: 'https://owtlette.base44.app/', category: 'sage', categoryName: 'Sage Scrolls', rank: 'B', reward: '500 Gold • Memory Charm', icon: '🎴' },
-        { id: 'S5', title: 'Things From Grammer', description: 'I purposely misspelled Grammar to ragbait tesco.', link: 'https://gantyfonta.github.io/Grammar/', category: 'sage', categoryName: 'Sage Scrolls', rank: 'C', reward: '150 Gold • Jester Badge', icon: '✍️' },
-        { id: 'S6', title: 'Graphing Calculator', description: 'Works with most graphs.', link: 'https://gantyfonta.github.io/gcalc/', category: 'sage', categoryName: 'Sage Scrolls', rank: 'B', reward: '400 Gold • Geometry Ring', icon: '📊' },
-
-        // COMBAT & SNACK QUESTS (Games)
-        { id: 'G1', title: 'Untitled Rouge', description: 'Choose a class and battle through the tower.', link: 'https://gantyfonta.github.io/untitledrouge/', category: 'combat', categoryName: 'Bounty Quests', rank: 'S', reward: '2,500 Gold • Mythic Blade', icon: '🗡️' },
-        { id: 'G2', title: 'Boxy Stack Empire', description: 'Stack boxes and use powerful tools to make $$$.', link: 'https://gantyfonta.github.io/Boxy/', category: 'combat', categoryName: 'Bounty Quests', rank: 'A', reward: '1,200 Gold • Builder Crest', icon: '📦' },
-        { id: 'G3', title: 'Brawl Star Arena', description: 'Brawl stars dont sue me please.', link: 'https://gantyfonta.github.io/brawl/', category: 'combat', categoryName: 'Bounty Quests', rank: 'B', reward: '600 Gold • Gladiator Shield', icon: '⭐' },
-        { id: 'G4', title: 'Untitled Speedrun Platformer', description: 'The new single greatest speedrunning platformer.', link: 'https://gantyfonta.github.io/jump/', category: 'combat', categoryName: 'Bounty Quests', rank: 'S', reward: '2,000 Gold • Hermes Boots', icon: '🏃' },
-        { id: 'G5', title: 'SprootTop Win98 Simulator', description: 'Windows 98 Sim on the Sproot.inc Laptop.', link: 'https://gantyfonta.github.io/Sproottop/', category: 'combat', categoryName: 'Bounty Quests', rank: 'A', reward: '1,000 Gold • Cyber Artifact', icon: '💻' },
-        { id: 'G6', title: 'Cess (Overloaded Chess)', description: 'Chess, but too much.', link: 'https://gantyfonta.github.io/cess/', category: 'combat', categoryName: 'Bounty Quests', rank: 'A', reward: '1,100 Gold • Grandmaster Crown', icon: '♟️' },
-        { id: 'G7', title: '2D Redstone Engine', description: '2D Minecraft redstone simulation featuring many redstone components.', link: 'https://gantyfonta.github.io/redstone/', category: 'combat', categoryName: 'Bounty Quests', rank: 'S', reward: '3,000 Gold • Redstone Core', icon: '⚡' },
-        { id: 'G8', title: 'Polytrack Racing', description: 'Play a drive game made by Kodub.', link: 'https://gantyfonta.github.io/polytrack/', category: 'combat', categoryName: 'Bounty Quests', rank: 'S', reward: '1,800 Gold • Nitro Engine', icon: '🏎️' },
-        { id: 'G9', title: 'Shapemon Duel', description: 'A Pokemon battle style game, but with shapes.', link: 'https://gantyfonta.github.io/Shapemon/', category: 'combat', categoryName: 'Bounty Quests', rank: 'B', reward: '750 Gold • Prism Stone', icon: '🔷' },
-        { id: 'G10', title: 'Retro Vault Emulator', description: 'Play several games from older consoles.', link: 'https://gantyfonta.github.io/wdbgub/emulator/index.html', category: 'combat', categoryName: 'Bounty Quests', rank: 'S', reward: '2,200 Gold • Nostalgia Gem', icon: '🕹️' },
-        { id: 'G11', title: 'Numberle Codebreaker', description: 'Play higher or lower in a wordle-ish number guessing game.', link: 'https://gantyfonta.github.io/Numberle/', category: 'combat', categoryName: 'Bounty Quests', rank: 'C', reward: '300 Gold • Decipher Ring', icon: '🔢' },
-        { id: 'G12', title: "Caesar's Spelling Bee", description: 'Spell out the spoken latin words.', link: 'https://gantyfonta.github.io/SpellingBee/', category: 'combat', categoryName: 'Bounty Quests', rank: 'B', reward: '550 Gold • Laurel Wreath', icon: '🐝' },
-        { id: 'G13', title: 'Online Chess Realm', description: 'Play chess against someone online.', link: 'https://gantyfonta.github.io/chess/', category: 'combat', categoryName: 'Bounty Quests', rank: 'B', reward: '650 Gold • Strategy Banner', icon: '🏰' },
-        { id: 'G14', title: 'Stonks Market Sim', description: 'Pretend you have stocks in an always changing stonks game.', link: 'https://gantyfonta.github.io/Stonks/', category: 'combat', categoryName: 'Bounty Quests', rank: 'B', reward: '800 Gold • Merchant Coin', icon: '📈' },
-        { id: 'G15', title: 'Forge of Legends', description: 'Make cool weapons, fight stuff. (Zoom out to see full weapons)', link: 'https://forge-of-legends-7e55fd62.base44.app/Forge', category: 'combat', categoryName: 'Bounty Quests', rank: 'S', reward: '3,500 Gold • Legendary Anvil', icon: '⚒️' },
-        { id: 'G16', title: 'Tavern Slot Machine', description: 'Two words: Slot Machine.', link: 'https://gantyfonta.github.io/Gambling/', category: 'combat', categoryName: 'Bounty Quests', rank: 'C', reward: '???? Gold • Gambler Token', icon: '🎰' },
-        { id: 'G17', title: 'Minotaur Maze Escape', description: 'Run from a minotaur in a maze.', link: 'https://gantyfonta.github.io/TheMaze/', category: 'combat', categoryName: 'Bounty Quests', rank: 'A', reward: '1,300 Gold • Labyrinth Map', icon: '🐂' },
-        { id: 'G18', title: 'Culinary Craft', description: 'Jesse, we need to cook.', link: 'https://culinary-craft-07cb0bc3.base44.app/', category: 'combat', categoryName: 'Bounty Quests', rank: 'A', reward: '1,400 Gold • Flask of Power', icon: '🧪' },
-
-        // MYSTERY & ARCANE (Misc)
-        { id: 'M1', title: 'Conflict Meeting Chamber', description: 'A room based meeting site that works like Zoom.', link: 'https://gantyfonta.github.io/conflict-chat/', category: 'arcane', categoryName: 'Arcane Mysteries', rank: 'A', reward: '1,200 Gold • Crystal Ball', icon: '🔮' },
-        { id: 'M2', title: 'Hand Physics Lab VR', description: 'A hand and face tracking simulation in 3D.', link: 'https://gantyfonta.github.io/HandPhysicsLab/', category: 'arcane', categoryName: 'Arcane Mysteries', rank: 'S', reward: '3,000 Gold • Spatial Gauntlets', icon: '🖐️' },
-        { id: 'M3', title: 'Grak the Caveman AI', description: 'Chat with Grak, a caveman AI.', link: 'https://preview--aura-chat-copy-255598c1.base44.app/Chat?hide_badge=true', category: 'arcane', categoryName: 'Arcane Mysteries', rank: 'B', reward: '500 Gold • Flint & Steel', icon: '🦴' },
-        { id: 'M4', title: 'Audio Synthesizer', description: 'Make music with arcane frequencies.', link: 'https://gantyfonta.github.io/synthesizer/', category: 'arcane', categoryName: 'Arcane Mysteries', rank: 'B', reward: '700 Gold • Bard Harp', icon: '🎵' },
-        { id: 'M5', title: 'Robert British AI', description: 'Talk to the ultimate codemaking British AI.', link: 'https://robert.base44.app', category: 'arcane', categoryName: 'Arcane Mysteries', rank: 'A', reward: '1,000 Gold • Monocle of Intellect', icon: '🎩' },
-        { id: 'M6', title: 'MultiCode Runner', description: 'Run most other websites / code inside of it.', link: 'https://gantyfonta.github.io/Multicoderunner/', category: 'arcane', categoryName: 'Arcane Mysteries', rank: 'S', reward: '2,800 Gold • Master Key', icon: '⚙️' },
-
-        // OINK GUILD (Oink Treats)
-        { id: 'O1', title: 'Oink-O-Clock Jump', description: 'The single greatest pig game ever made.', link: 'https://gantyfonta.github.io/oinkoclockjump/', category: 'oink', categoryName: 'Porcine Guild', rank: 'S', reward: '5,000 Gold • Golden Snout', icon: '🐷' },
-        { id: 'O2', title: 'OOCJ Duel Battles', description: 'Two players. See whos the ultimate pig.', link: 'https://gantyfonta.github.io/OOCJBattles/', category: 'oink', categoryName: 'Porcine Guild', rank: 'A', reward: '1,500 Gold • Pig Championship Belt', icon: '⚔️' },
-        { id: 'O3', title: 'Moinkcraft 2D Sandbox', description: 'A WIP 2D sandbox game about pigs.', link: 'https://gantyfonta.github.io/OOCJRouge/', category: 'oink', categoryName: 'Porcine Guild', rank: 'S', reward: '3,200 Gold • Mud Crown', icon: '⛏️' },
-
-        // SHADOW REALM (Familiar)
-        { id: 'E1', title: 'Sprootgle Parchment Docs', description: 'A very familiar seeming document program.', link: 'https://sproot-docs.base44.app', category: 'shadow', categoryName: 'Shadow Realm', rank: 'B', reward: '600 Gold • Illusion Scroll', icon: '📄' },
-        { id: 'E2', title: 'Sprootify Bardic Player', description: 'A music app for all your music needs.', link: 'https://vibefy.base44.app/', category: 'shadow', categoryName: 'Shadow Realm', rank: 'B', reward: '650 Gold • Siren Flute', icon: '🎧' },
-        { id: 'E3', title: 'Conflict Mirror Realm', description: 'A simple messaging app that looks familiar.', link: 'https://gantyfonta.github.io/conflict/', category: 'shadow', categoryName: 'Shadow Realm', rank: 'B', reward: '700 Gold • Shadow Mirror', icon: '💬' }
-      ];
-
-      // Rank Badges Styling Configuration
-      const rankStyles = {
-        'S': { bg: 'bg-amber-500/20 text-amber-300 border-amber-500/60', seal: 'bg-amber-700 text-amber-200' },
-        'A': { bg: 'bg-purple-500/20 text-purple-300 border-purple-500/60', seal: 'bg-purple-800 text-purple-200' },
-        'B': { bg: 'bg-blue-500/20 text-blue-300 border-blue-500/60', seal: 'bg-blue-800 text-blue-200' },
-        'C': { bg: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/60', seal: 'bg-emerald-800 text-emerald-200' },
+      const projectData = {
+        school: {
+          name: 'School Projects', icon: '🎓', actionText: 'Open',
+          items: [
+            { title: 'Latin Dictionary WIP', description: 'Latin dictionary for all your latin dictionary needs!', link: 'https://gantyfonta.github.io/LD/' },
+            { title: 'Significant Figures Calculator', description: 'Do math with rounding and automatic SF handling.', link: 'https://gantyfonta.github.io/SigFigCalc/' },
+            { title: 'Latin AI', description: 'Ask for help to an AI chatbot.', link: 'https://latinusmagister.base44.app/' },
+            { title: 'Outlet', description: 'Paste in flashcards or vocab words and study them.', link: 'https://owtlette.base44.app/' },
+            { title: 'Things From Grammer', description: 'I purposely misspelled Grammar to ragbait tesco.', link: 'https://gantyfonta.github.io/Grammar/' },
+            { title: 'Graphing Calculator', description: 'Works with most graphs.', link: 'https://gantyfonta.github.io/gcalc/' },
+          ]
+        },
+        games: {
+          name: 'Random Games', icon: '🎮', actionText: 'Play',
+          items: [
+            { title: 'Boxy', description: 'Stack boxes and use poweful tools to make $$$.', link: 'https://gantyfonta.github.io/Boxy/' },
+            { title: 'Brawl Star', description: 'Brawl stars dont sue me please.', link: 'https://gantyfonta.github.io/brawl/' },
+            { title: 'Untitled Platformer', description: 'The new single greatest speedruning platformer.', link: 'https://gantyfonta.github.io/jump/' },
+            { title: 'SprootTop', description: 'Windows 98 Sim on the Sproot.inc Laptop.', link: 'https://gantyfonta.github.io/Sproottop/' },
+            { title: 'Cess', description: 'Chess, but too much.', link: 'https://gantyfonta.github.io/cess/' },
+            { title: 'Redstone Simulator', description: '2D Minecraft redstone simulation featuring many redstone components.', link: 'https://gantyfonta.github.io/redstone/' },
+            { title: 'Polytrack', description: 'Play a drive game made by Kodub.', link: 'https://gantyfonta.github.io/polytrack/' },
+            { title: 'Shapemon', description: 'A Pokemon battle style game, but with shapes.', link: 'https://gantyfonta.github.io/Shapemon/' },
+            { title: 'Emulator', description: 'Play several games from older consoles.', link: 'https://gantyfonta.github.io/wdbgub/emulator/index.html' },
+            { title: 'Numberle', description: 'Play higher or lower in a wordle-ish number guessing game.', link: 'https://gantyfonta.github.io/Numberle/' },
+            { title: "Caesar's Spelling Bee", description: 'Spell out the spoken latin words.', link: 'https://gantyfonta.github.io/SpellingBee/' },
+            { title: 'Chess', description: 'Play chess against someone online.', link: 'https://gantyfonta.github.io/chess/' },
+            { title: 'Stonks', description: 'Pretend you have stocks in an always changing stonks game.', link: 'https://gantyfonta.github.io/Stonks/' },
+            { title: 'Forge of Legends', description: 'Make cool weapons, fight stuff. (Zoom out to see full weapons)', link: 'https://forge-of-legends-7e55fd62.base44.app/Forge' },
+            { title: 'Gambling', description: 'Two words: Slot Machine.', link: 'https://gantyfonta.github.io/Gambling/' },
+            { title: 'The Maze', description: 'Run from a minotaur in a maze.', link: 'https://gantyfonta.github.io/TheMaze/' },
+            { title: 'RNG', description: 'A poorly made RNG game.', link: 'https://gantyfonta.github.io/Rng/' },
+            { title: 'Poker', description: 'Classic poker.', link: 'https://gantyfonta.github.io/Poker/' },
+            { title: 'Blackjack', description: 'Reach 21 to win.', link: 'https://gantyfonta.github.io/Blackjack/' },
+            { title: 'Russian Roulette', description: 'Simple (bad) Russian Roulette.', link: 'https://gantyfonta.github.io/RussianRoulette/' },
+            { title: 'Culinary Craft', description: 'Jesse, we need to cook.', link: 'https://culinary-craft-07cb0bc3.base44.app/' },
+            { title: 'Chalkboard', description: 'Draw on a chalkboard with people.', link: 'https://gantyfonta.github.io/chalkboard/' },
+            { title: 'Multiplayer Checkboxes', description: 'Click checkboxes and see them on other peoples screens.', link: 'https://gantyfonta.github.io/checkboxes/' },
+            { title: 'Lightbulb', description: 'To turn on or off lightbulbs.', link: 'https://gantyfonta.github.io/Lightbulb/' },
+          ]
+        },
+        misc: {
+          name: 'Miscellaneous', icon: '⚡', actionText: 'Open',
+          items: [
+            { title: 'Conflict Rooms', description: 'A room based meeting site that works like Zoom and looks like Conflict.', link: 'https://gantyfonta.github.io/conflict-chat/' },
+            { title: 'Hand Physics Lab', description: 'A hand and face tracking simulation in 3D.', link: 'https://gantyfonta.github.io/HandPhysicsLab/' },
+            { title: 'Grak the AI Caveman', description: 'Chat with Grak, a caveman AI.', link: 'https://preview--aura-chat-copy-255598c1.base44.app/Chat?hide_badge=true' },
+            { title: 'Synthesizer', description: 'Make music.', link: 'https://gantyfonta.github.io/synthesizer/' },
+            { title: 'Robert the AI', description: 'Talk to the ultimate codemaking British AI.', link: 'https://robert.base44.app' },
+            { title: 'GantyMail', description: 'Another email(chat) system to talk to people.', link: 'https://gantyfonta.github.io/gantymail/' },
+            { title: 'Blurp', description: 'Create an account, add people and talk to them.', link: 'https://gantyfonta.github.io/blurp/' },
+            { title: 'MultiCode Runner', description: 'Run most other websites / code inside of it.', link: 'https://gantyfonta.github.io/Multicoderunner/' },
+            { title: 'Grak 2.0', description: 'Grak, but obsessed with space.', link: 'https://gantyfonta.github.io/grak2.0/' },
+            { title: 'Grak (oldest)', description: 'The oldest primordial Grak.', link: 'https://gantyfonta.github.io/grak/' },
+          ]
+        },
+        oink: {
+          name: "Oink O' Stuff", icon: '🐷', actionText: 'Launch',
+          items: [
+            { title: 'Oink-O-Clock Jump', description: 'The single greatest game ever made.', link: 'https://gantyfonta.github.io/oinkoclockjump/' },
+            { title: 'OOCJ Battles', description: 'Two players. See whos the best.', link: 'https://gantyfonta.github.io/OOCJBattles/' },
+            { title: 'Moinkcraft', description: 'A WIP 2D sandbox game about pigs.', link: 'https://gantyfonta.github.io/OOCJRouge/' },
+          ]
+        },
+        familiar: {
+          name: 'Oddly Familiar', icon: '👁️', actionText: 'Visit',
+          items: [
+            { title: 'Sprootgle Docs', description: 'A very familiar seeming document program.', link: 'https://sproot-docs.base44.app' },
+            { title: 'Sprootify', description: 'A music app for all your music needs.', link: 'https://vibefy.base44.app/' },
+            { title: 'Conflict', description: 'A simple messaging app that looks familiar.', link: 'https://gantyfonta.github.io/conflict/' },
+          ]
+        }
       };
 
-      const App = () => {
-        const [activeGuild, setActiveGuild] = useState('all');
-        const [activeRank, setActiveRank] = useState('all');
-        const [searchQuery, setSearchQuery] = useState('');
-        const [acceptedQuests, setAcceptedQuests] = useState([]);
-        const [goldCoins, setGoldCoins] = useState(4850);
+      // -------------------- COMPONENTS --------------------
+      const DataTable = ({ category, data }) => (
+        <div className="mb-12">
+          <div className="flex items-center gap-2 mb-4 sticky top-[60px] bg-[#191919] py-2 z-10">
+            <span className="text-2xl">{category.icon}</span>
+            <h2 className="text-xl font-semibold text-white">{category.name}</h2>
+            <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-[#2e2e2e] text-[#a3a3a3] rounded-full">
+              {data.length}
+            </span>
+          </div>
+          
+          <div className="w-full border border-[#2e2e2e] rounded-lg overflow-hidden bg-[#1f1f1f]">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-[#2e2e2e] bg-[#262626] text-[#a3a3a3]">
+                  <th className="py-2.5 px-4 font-medium w-1/3">Name</th>
+                  <th className="py-2.5 px-4 font-medium w-7/12 hidden md:table-cell">Description</th>
+                  <th className="py-2.5 px-4 font-medium w-1/12 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((item, idx) => (
+                  <tr 
+                    key={idx} 
+                    className="border-b border-[#2e2e2e] last:border-0 hover:bg-[#2e2e2e] transition-colors group"
+                  >
+                    <td className="py-3 px-4 text-white font-medium">
+                      {item.title}
+                      {/* Show description on mobile only */}
+                      <p className="text-sm text-[#737373] font-normal mt-1 md:hidden">
+                        {item.description}
+                      </p>
+                    </td>
+                    <td className="py-3 px-4 text-[#a3a3a3] hidden md:table-cell">
+                      {item.description}
+                    </td>
+                    <td className="py-3 px-4 text-right">
+                      <a 
+                        href={item.link} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center text-sm font-medium text-[#a3a3a3] hover:text-white transition-colors"
+                      >
+                        {category.actionText} ↗
+                      </a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
 
-        const handleAcceptQuest = (quest) => {
-          if (!acceptedQuests.includes(quest.id)) {
-            setAcceptedQuests([...acceptedQuests, quest.id]);
-            setGoldCoins(prev => prev + 500);
-          }
-          window.open(quest.link, '_blank');
+      // -------------------- MAIN APP --------------------
+      const App = () => {
+        const [searchQuery, setSearchQuery] = useState('');
+
+        const handleSearchChange = (e) => {
+          const value = e.target.value;
+          setSearchQuery(value);
+          // Easter eggs
+          if (value.toLowerCase() === 'bird') window.location.href = 'bird.html';
+          if (value.toLowerCase() === 'jump') window.location.href = 'jump.html';
         };
 
-        const filteredQuests = questCatalog.filter(q => {
-          const matchesGuild = activeGuild === 'all' || q.category === activeGuild;
-          const matchesRank = activeRank === 'all' || q.rank === activeRank;
-          const matchesSearch = q.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                                q.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                                q.reward.toLowerCase().includes(searchQuery.toLowerCase());
-          return matchesGuild && matchesRank && matchesSearch;
-        });
+        // Filter all categories based on search
+        const filteredData = Object.entries(projectData).map(([key, category]) => {
+          const filteredItems = category.items.filter(item =>
+            item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.description.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+          return { ...category, items: filteredItems };
+        }).filter(category => category.items.length > 0); // Remove empty categories
 
         return (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[900px] mx-auto min-h-screen px-4 py-16 md:px-8">
             
-            {/* TAVERN WOODEN FRAME CONTAINER */}
-            <div className="wood-panel border-8 border-[#3b2314] rounded-2xl p-6 sm:p-10 relative overflow-hidden">
-              
-              {/* TOP HERO & GUILDMASTER HEADER */}
-              <div className="border-b-4 border-[#3b2314] pb-8 mb-8 flex flex-col md:flex-row justify-between items-center gap-6">
-                <div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-3xl">🛡️</span>
-                    <h1 className="medieval-title text-3xl sm:text-5xl font-black text-amber-200 tracking-wide drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)]">
-                      THE ADVENTURER'S GUILD
-                    </h1>
-                  </div>
-                  <p className="text-amber-400/80 text-sm sm:text-base mt-2 font-semibold">
-                    Select a bounty quest scroll below to embark on digital domain expeditions.
-                  </p>
-                </div>
+            {/* Header Document Area */}
+            <header className="mb-12">
+              <div className="text-6xl mb-6">🗄️</div>
+              <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">
+                Random Side Projects
+              </h1>
+              <p className="text-[#a3a3a3] text-lg mb-8 max-w-2xl">
+                A master database of everything I've built. Includes school tools, oddly familiar sites, and an extensive collection of HTML5 games.
+              </p>
 
-                {/* ADVENTURER STAT CARD */}
-                <div className="bg-[#120a06] border-2 border-[#5c3a21] rounded-xl p-4 flex items-center gap-6 shadow-inner min-w-[280px]">
-                  <div className="relative">
-                    <div className="w-14 h-14 rounded-full bg-amber-900/60 border-2 border-amber-500 flex items-center justify-center text-2xl shadow-lg">
-                      🧙‍♂️
-                    </div>
-                    <span className="absolute -bottom-1 -right-1 bg-amber-600 text-black text-[10px] font-black px-1.5 py-0.5 rounded-full border border-black">
-                      LVL 34
-                    </span>
-                  </div>
-                  <div>
-                    <h4 className="medieval-title text-amber-200 font-bold text-lg">Guildmaster Ganty</h4>
-                    <div className="flex items-center gap-4 text-xs mt-1 mono-text">
-                      <span className="text-amber-400 font-bold flex items-center gap-1">
-                        🪙 {goldCoins.toLocaleString()} GP
-                      </span>
-                      <span className="text-emerald-400 font-bold">
-                        📜 {acceptedQuests.length} Quests
-                      </span>
-                    </div>
-                  </div>
+              {/* Minimalist Search Bar */}
+              <div className="relative sticky top-0 z-20 pb-4 pt-2 bg-[#191919]">
+                <div className="flex items-center px-3 py-2 bg-[#1f1f1f] border border-[#2e2e2e] rounded-md focus-within:border-[#555] transition-colors shadow-sm">
+                  <span className="text-[#737373] mr-2">🔍</span>
+                  <input
+                    type="text"
+                    className="w-full bg-transparent border-none outline-none text-[#d4d4d4] placeholder-[#737373]"
+                    placeholder="Filter by name or description..."
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                  />
+                  {searchQuery && (
+                    <button 
+                      onClick={() => setSearchQuery('')}
+                      className="text-[#737373] hover:text-[#d4d4d4] text-sm ml-2 px-1"
+                    >
+                      Clear
+                    </button>
+                  )}
                 </div>
               </div>
+            </header>
 
-              {/* FILTERING CONTROLS PANEL */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
-                
-                {/* SEARCH PARCHMENT INPUT */}
-                <div className="lg:col-span-5">
-                  <label className="block text-xs text-amber-400/80 font-bold mb-2 uppercase tracking-wider">
-                    Search Quest Archives
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      className="w-full bg-[#ebd2ad] text-[#2b1810] placeholder-[#6b4733] font-bold border-2 border-[#b38e58] rounded-lg px-4 py-2.5 pl-10 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all text-sm shadow-md"
-                      placeholder="Search quest name, reward, keyword..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    <span className="absolute left-3 top-2.5 text-base text-[#6b4733]">🔍</span>
-                  </div>
-                </div>
-
-                {/* GUILD / CATEGORY FILTER BUTTONS */}
-                <div className="lg:col-span-7 flex flex-col justify-end">
-                  <label className="block text-xs text-amber-400/80 font-bold mb-2 uppercase tracking-wider">
-                    Guild Halls & Ranks
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    
-                    {/* Guild Filter Pills */}
-                    {[
-                      { key: 'all', label: 'All Guilds', icon: '🏛️' },
-                      { key: 'sage', label: 'Sage Scrolls', icon: '📜' },
-                      { key: 'combat', label: 'Bounty Quests', icon: '⚔️' },
-                      { key: 'arcane', label: 'Arcane', icon: '🔮' },
-                      { key: 'oink', label: 'Porcine Guild', icon: '🐷' },
-                      { key: 'shadow', label: 'Shadow Realm', icon: '👁️' }
-                    ].map(g => (
-                      <button
-                        key={g.key}
-                        onClick={() => setActiveGuild(g.key)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border ${
-                          activeGuild === g.key
-                            ? 'bg-amber-600 text-black border-amber-300 shadow-[0_0_10px_rgba(217,119,6,0.5)]'
-                            : 'bg-[#120a06] text-amber-300/80 border-[#3b2314] hover:bg-[#2b1810]'
-                        }`}
-                      >
-                        <span>{g.icon}</span> {g.label}
-                      </button>
-                    ))}
-
-                    <div className="h-6 w-0.5 bg-[#3b2314] self-center mx-1 hidden sm:block"></div>
-
-                    {/* Rank Filter Pills */}
-                    {['all', 'S', 'A', 'B', 'C'].map(r => (
-                      <button
-                        key={r}
-                        onClick={() => setActiveRank(r)}
-                        className={`px-2.5 py-1 rounded text-xs font-black transition-all border ${
-                          activeRank === r
-                            ? 'bg-amber-400 text-black border-amber-200'
-                            : 'bg-[#120a06] text-amber-400/60 border-[#3b2314] hover:text-amber-200'
-                        }`}
-                      >
-                        {r === 'all' ? 'RANK ALL' : `RANK ${r}`}
-                      </button>
-                    ))}
-
-                  </div>
-                </div>
-
-              </div>
-
-              {/* QUEST BOARD PARCHMENT CARDS GRID */}
-              {filteredQuests.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredQuests.map((quest) => {
-                    const style = rankStyles[quest.rank];
-                    const isAccepted = acceptedQuests.includes(quest.id);
-
-                    return (
-                      <div
-                        key={quest.id}
-                        className="parchment-card rounded-xl p-5 relative flex flex-col justify-between transition-all duration-300 hover:-translate-y-2 group"
-                      >
-                        {/* CARD TOP BAR: RANK BADGE & WAX SEAL */}
-                        <div>
-                          <div className="flex justify-between items-center mb-3">
-                            <span className={`px-2.5 py-0.5 rounded border text-xs font-black mono-text ${style.bg}`}>
-                              RANK {quest.rank}
-                            </span>
-                            
-                            {/* Decorative Wax Seal Icon */}
-                            <div className={`w-8 h-8 rounded-full ${style.seal} wax-seal flex items-center justify-center text-sm font-bold shadow-md`}>
-                              {quest.icon}
-                            </div>
-                          </div>
-
-                          {/* QUEST TITLE & DESCRIPTION */}
-                          <h3 className="medieval-title font-black text-xl text-[#2b1810] group-hover:text-amber-900 transition-colors leading-tight mb-2">
-                            {quest.title}
-                          </h3>
-                          
-                          <p className="text-xs text-[#523324] font-medium leading-relaxed mb-4">
-                            {quest.description}
-                          </p>
-                        </div>
-
-                        {/* REWARD INFO & ACCEPT BUTTON */}
-                        <div>
-                          <div className="border-t border-[#b38e58]/50 pt-3 mb-4 flex items-center justify-between text-xs font-bold text-[#422619] mono-text">
-                            <span>REWARD:</span>
-                            <span className="text-amber-900 bg-amber-200/60 px-2 py-0.5 rounded border border-amber-400/50">
-                              {quest.reward}
-                            </span>
-                          </div>
-
-                          <button
-                            onClick={() => handleAcceptQuest(quest)}
-                            className={`w-full py-2.5 rounded-lg font-black medieval-title tracking-wider text-sm transition-all shadow-md flex items-center justify-center gap-2 ${
-                              isAccepted
-                                ? 'bg-emerald-800 text-emerald-100 hover:bg-emerald-700 border border-emerald-600'
-                                : 'bg-[#3b1d11] text-amber-200 hover:bg-[#592c19] border border-[#6f3820] hover:text-white'
-                            }`}
-                          >
-                            <span>{isAccepted ? '✓ COMPLETED' : '⚔️ ACCEPT QUEST'}</span>
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+            {/* Main Content Area */}
+            <main>
+              {filteredData.length > 0 ? (
+                filteredData.map((category, index) => (
+                  <DataTable key={index} category={category} data={category.items} />
+                ))
               ) : (
-                <div className="text-center py-20 bg-[#120a06]/50 rounded-xl border-2 border-dashed border-[#3b2314]">
-                  <div className="text-6xl mb-3">📜</div>
-                  <h3 className="medieval-title text-2xl text-amber-300 font-bold">No Bounty Scrolls Found</h3>
-                  <p className="text-xs text-amber-500/70 mt-1">Try resetting your guild filters or search term.</p>
+                <div className="text-[#a3a3a3] py-8 text-center border border-dashed border-[#2e2e2e] rounded-lg">
+                  No projects matching "{searchQuery}". Grak is confused.
                 </div>
               )}
+            </main>
 
-              {/* FOOTER */}
-              <footer className="mt-12 pt-6 border-t-2 border-[#3b2314] text-center text-xs text-amber-500/60 mono-text">
-                © 2026 Ganty's Adventurer Guild. Bounties subject to immediate realm teleportation.
-              </footer>
-
-            </div>
-
+            <footer className="mt-16 pt-8 border-t border-[#2e2e2e] text-sm text-[#737373]">
+              End of Database.
+            </footer>
           </div>
         );
       };
