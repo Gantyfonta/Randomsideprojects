@@ -3,429 +3,341 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ganty's Project Vending Machine</title>
+    <title>The Adventurer's Guild - Quest Board</title>
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=MedievalSharp&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
       body {
-        font-family: 'Fredoka', sans-serif;
-        background-color: #12131C;
-        color: #F3F4F6;
+        font-family: 'Cinzel', serif;
+        background-color: #0e0a07;
+        background-image: 
+          radial-gradient(circle at 50% 20%, rgba(180, 83, 9, 0.15) 0%, transparent 60%),
+          radial-gradient(circle at 80% 80%, rgba(120, 53, 15, 0.1) 0%, transparent 50%);
+        color: #f1e5d1;
       }
 
-      .led-display {
-        font-family: 'VT323', monospace;
-        background-color: #051A05;
-        color: #33FF33;
-        text-shadow: 0 0 5px #33FF33;
-        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+      .medieval-title {
+        font-family: 'MedievalSharp', cursive;
       }
 
       .mono-text {
         font-family: 'Share Tech Mono', monospace;
       }
 
-      /* Vending Machine Glass Effect */
-      .vending-glass {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 40%, rgba(255, 255, 255, 0.05) 100%);
-        box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.7), 0 0 15px rgba(255, 255, 255, 0.05);
+      /* Tavern Wood Panel Visual Effect */
+      .wood-panel {
+        background: #1c130d;
+        background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(0, 0, 0, 0.3) 100%),
+                          repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(0,0,0,0.15) 40px, rgba(0,0,0,0.15) 41px);
+        box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.9), 0 15px 35px rgba(0, 0, 0, 0.8);
       }
 
-      /* Coil effect behind items */
-      .coil-spring {
-        background: repeating-linear-gradient(
-          90deg,
-          transparent,
-          transparent 8px,
-          rgba(255, 255, 255, 0.2) 8px,
-          rgba(255, 255, 255, 0.2) 12px
-        );
+      /* Parchment Card Styling */
+      .parchment-card {
+        background: #ebd2ad;
+        background-image: radial-gradient(circle at 50% 50%, #f4e4bc 0%, #d8b884 100%);
+        color: #2b1810;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.6), inset 0 0 15px rgba(139, 69, 19, 0.3);
+        border: 2px solid #b38e58;
+      }
+
+      .parchment-card:hover {
+        box-shadow: 0 15px 30px rgba(234, 179, 8, 0.25), inset 0 0 20px rgba(139, 69, 19, 0.2);
+      }
+
+      /* Wax Seal Effect */
+      .wax-seal {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5), inset 0 -3px 6px rgba(0, 0, 0, 0.4), inset 0 3px 6px rgba(255, 255, 255, 0.3);
       }
 
       html { scroll-behavior: smooth; }
 
-      ::-webkit-scrollbar { width: 8px; }
-      ::-webkit-scrollbar-track { background: #181824; }
-      ::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
-      ::-webkit-scrollbar-thumb:hover { background: #4B5563; }
+      ::-webkit-scrollbar { width: 10px; }
+      ::-webkit-scrollbar-track { background: #120b07; }
+      ::-webkit-scrollbar-thumb { background: #5c3a21; border-radius: 5px; border: 1px solid #2b1810; }
+      ::-webkit-scrollbar-thumb:hover { background: #825331; }
     </style>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   </head>
-  <body class="antialiased selection:bg-emerald-500 selection:text-black min-h-screen py-8">
+  <body class="antialiased selection:bg-amber-700 selection:text-amber-100 min-h-screen py-8">
     <div id="root"></div>
 
     <script type="text/babel">
-      const { useState, useEffect } = React;
+      const { useState } = React;
 
       // -----------------------------------------------------------------
-      // DATA CONFIGURATION WITH VENDING ROW CODES
+      // QUEST DATA CATALOG WITH RPG METADATA
       // -----------------------------------------------------------------
-      const projectData = {
-        school: {
-          rowCode: 'A', name: 'Brain Juice', icon: '🧠', actionText: 'VEND ITEM',
-          items: [
-            { title: 'Latin Dictionary WIP', description: 'Latin dictionary for all your latin dictionary needs!', link: 'https://gantyfonta.github.io/LD/' },
-            { title: 'Significant Figures Calculator', description: 'Do math with rounding and automatic SF handling.', link: 'https://gantyfonta.github.io/SigFigCalc/' },
-            { title: 'Latin AI', description: 'Ask for help to an AI chatbot.', link: 'https://latinusmagister.base44.app/' },
-            { title: 'Outlet', description: 'Paste in flashcards or vocab words and study them.', link: 'https://owtlette.base44.app/' },
-            { title: 'Things From Grammer', description: 'I purposely misspelled Grammar to ragbait tesco.', link: 'https://gantyfonta.github.io/Grammar/' },
-            { title: 'Graphing Calculator', description: 'Works with most graphs.', link: 'https://gantyfonta.github.io/gcalc/' },
-          ]
-        },
-        games: {
-          rowCode: 'B', name: 'Snack Games', icon: '🕹️', actionText: 'VEND ITEM',
-          items: [
-            { title: 'Untitled Rouge', description: 'Choose a class and battle through the tower.', link:'https://gantyfonta.github.io/untitledrouge/'},
-            { title: 'Boxy', description: 'Stack boxes and use poweful tools to make $$$.', link: 'https://gantyfonta.github.io/Boxy/' },
-            { title: 'Brawl Star', description: 'Brawl stars dont sue me please.', link: 'https://gantyfonta.github.io/brawl/' },
-            { title: 'Untitled Platformer', description: 'The new single greatest speedruning platformer.', link: 'https://gantyfonta.github.io/jump/' },
-            { title: 'SprootTop', description: 'Windows 98 Sim on the Sproot.inc Laptop.', link: 'https://gantyfonta.github.io/Sproottop/' },
-            { title: 'Cess', description: 'Chess, but too much.', link: 'https://gantyfonta.github.io/cess/' },
-            { title: 'Redstone Simulator', description: '2D Minecraft redstone simulation featuring many redstone components.', link: 'https://gantyfonta.github.io/redstone/' },
-            { title: 'Polytrack', description: 'Play a drive game made by Kodub.', link: 'https://gantyfonta.github.io/polytrack/' },
-            { title: 'Shapemon', description: 'A Pokemon battle style game, but with shapes.', link: 'https://gantyfonta.github.io/Shapemon/' },
-            { title: 'Emulator', description: 'Play several games from older consoles.', link: 'https://gantyfonta.github.io/wdbgub/emulator/index.html' },
-            { title: 'Numberle', description: 'Play higher or lower in a wordle-ish number guessing game.', link: 'https://gantyfonta.github.io/Numberle/' },
-            { title: "Caesar's Spelling Bee", description: 'Spell out the spoken latin words.', link: 'https://gantyfonta.github.io/SpellingBee/' },
-            { title: 'Chess', description: 'Play chess against someone online.', link: 'https://gantyfonta.github.io/chess/' },
-            { title: 'Stonks', description: 'Pretend you have stocks in an always changing stonks game.', link: 'https://gantyfonta.github.io/Stonks/' },
-            { title: 'Forge of Legends', description: 'Make cool weapons, fight stuff. (Zoom out to see full weapons)', link: 'https://forge-of-legends-7e55fd62.base44.app/Forge' },
-            { title: 'Gambling', description: 'Two words: Slot Machine.', link: 'https://gantyfonta.github.io/Gambling/' },
-            { title: 'The Maze', description: 'Run from a minotaur in a maze.', link: 'https://gantyfonta.github.io/TheMaze/' },
-            { title: 'RNG', description: 'A poorly made RNG game.', link: 'https://gantyfonta.github.io/Rng/' },
-            { title: 'Poker', description: 'Classic poker.', link: 'https://gantyfonta.github.io/Poker/' },
-            { title: 'Blackjack', description: 'Reach 21 to win.', link: 'https://gantyfonta.github.io/Blackjack/' },
-            { title: 'Russian Roulette', description: 'Simple (bad) Russian Roulette.', link: 'https://gantyfonta.github.io/RussianRoulette/' },
-            { title: 'Culinary Craft', description: 'Jesse, we need to cook.', link: 'https://culinary-craft-07cb0bc3.base44.app/' },
-            { title: 'Chalkboard', description: 'Draw on a chalkboard with people.', link: 'https://gantyfonta.github.io/chalkboard/' },
-            { title: 'Multiplayer Checkboxes', description: 'Click checkboxes and see them on other peoples screens.', link: 'https://gantyfonta.github.io/checkboxes/' },
-            { title: 'Lightbulb', description: 'To turn on or off lightbulbs.', link: 'https://gantyfonta.github.io/Lightbulb/' },
-          ]
-        },
-        misc: {
-          rowCode: 'C', name: 'Mystery Snacks', icon: '🌀', actionText: 'VEND ITEM',
-          items: [
-            { title: 'Conflict Rooms', description: 'A room based meeting site that works like Zoom and looks like Conflict.', link: 'https://gantyfonta.github.io/conflict-chat/' },
-            { title: 'Hand Physics Lab', description: 'A hand and face tracking simulation in 3D.', link: 'https://gantyfonta.github.io/HandPhysicsLab/' },
-            { title: 'Grak the AI Caveman', description: 'Chat with Grak, a caveman AI.', link: 'https://preview--aura-chat-copy-255598c1.base44.app/Chat?hide_badge=true' },
-            { title: 'Synthesizer', description: 'Make music.', link: 'https://gantyfonta.github.io/synthesizer/' },
-            { title: 'Robert the AI', description: 'Talk to the ultimate codemaking British AI.', link: 'https://robert.base44.app' },
-            { title: 'GantyMail', description: 'Another email(chat) system to talk to people.', link: 'https://gantyfonta.github.io/gantymail/' },
-            { title: 'Blurp', description: 'Create an account, add people and talk to them.', link: 'https://gantyfonta.github.io/blurp/' },
-            { title: 'MultiCode Runner', description: 'Run most other websites / code inside of it.', link: 'https://gantyfonta.github.io/Multicoderunner/' },
-            { title: 'Grak 2.0', description: 'Grak, but obsessed with space.', link: 'https://gantyfonta.github.io/grak2.0/' },
-            { title: 'Grak (oldest)', description: 'The oldest primordial Grak.', link: 'https://gantyfonta.github.io/grak/' },
-          ]
-        },
-        oink: {
-          rowCode: 'D', name: "Oink Treats", icon: '🐷', actionText: 'VEND ITEM',
-          items: [
-            { title: 'Oink-O-Clock Jump', description: 'The single greatest game ever made.', link: 'https://gantyfonta.github.io/oinkoclockjump/' },
-            { title: 'OOCJ Battles', description: 'Two players. See whos the best.', link: 'https://gantyfonta.github.io/OOCJBattles/' },
-            { title: 'Moinkcraft', description: 'A WIP 2D sandbox game about pigs.', link: 'https://gantyfonta.github.io/OOCJRouge/' },
-          ]
-        },
-        familiar: {
-          rowCode: 'E', name: 'Odd Goodies', icon: '👁️', actionText: 'VEND ITEM',
-          items: [
-            { title: 'Sprootgle Docs', description: 'A very familiar seeming document program.', link: 'https://sproot-docs.base44.app' },
-            { title: 'Sprootify', description: 'A music app for all your music needs.', link: 'https://vibefy.base44.app/' },
-            { title: 'Conflict', description: 'A simple messaging app that looks familiar.', link: 'https://gantyfonta.github.io/conflict/' },
-          ]
-        }
+      const questCatalog = [
+        // SAGE SCROLLS (School)
+        { id: 'S1', title: 'Latin Dictionary WIP', description: 'Latin dictionary for all your latin dictionary needs!', link: 'https://gantyfonta.github.io/LD/', category: 'sage', categoryName: 'Sage Scrolls', rank: 'B', reward: '450 Gold • +50 Wisdom', icon: '📜' },
+        { id: 'S2', title: 'Significant Figures Calc', description: 'Do math with rounding and automatic SF handling.', link: 'https://gantyfonta.github.io/SigFigCalc/', category: 'sage', categoryName: 'Sage Scrolls', rank: 'C', reward: '200 Gold • Alchemy Skill', icon: '📐' },
+        { id: 'S3', title: 'Latin AI Guildmaster', description: 'Ask for help to an AI chatbot.', link: 'https://latinusmagister.base44.app/', category: 'sage', categoryName: 'Sage Scrolls', rank: 'A', reward: '900 Gold • Arcane Tome', icon: '🤖' },
+        { id: 'S4', title: 'Outlet Flashcard Grimoire', description: 'Paste in flashcards or vocab words and study them.', link: 'https://owtlette.base44.app/', category: 'sage', categoryName: 'Sage Scrolls', rank: 'B', reward: '500 Gold • Memory Charm', icon: '🎴' },
+        { id: 'S5', title: 'Things From Grammer', description: 'I purposely misspelled Grammar to ragbait tesco.', link: 'https://gantyfonta.github.io/Grammar/', category: 'sage', categoryName: 'Sage Scrolls', rank: 'C', reward: '150 Gold • Jester Badge', icon: '✍️' },
+        { id: 'S6', title: 'Graphing Calculator', description: 'Works with most graphs.', link: 'https://gantyfonta.github.io/gcalc/', category: 'sage', categoryName: 'Sage Scrolls', rank: 'B', reward: '400 Gold • Geometry Ring', icon: '📊' },
+
+        // COMBAT & SNACK QUESTS (Games)
+        { id: 'G1', title: 'Untitled Rouge', description: 'Choose a class and battle through the tower.', link: 'https://gantyfonta.github.io/untitledrouge/', category: 'combat', categoryName: 'Bounty Quests', rank: 'S', reward: '2,500 Gold • Mythic Blade', icon: '🗡️' },
+        { id: 'G2', title: 'Boxy Stack Empire', description: 'Stack boxes and use powerful tools to make $$$.', link: 'https://gantyfonta.github.io/Boxy/', category: 'combat', categoryName: 'Bounty Quests', rank: 'A', reward: '1,200 Gold • Builder Crest', icon: '📦' },
+        { id: 'G3', title: 'Brawl Star Arena', description: 'Brawl stars dont sue me please.', link: 'https://gantyfonta.github.io/brawl/', category: 'combat', categoryName: 'Bounty Quests', rank: 'B', reward: '600 Gold • Gladiator Shield', icon: '⭐' },
+        { id: 'G4', title: 'Untitled Speedrun Platformer', description: 'The new single greatest speedrunning platformer.', link: 'https://gantyfonta.github.io/jump/', category: 'combat', categoryName: 'Bounty Quests', rank: 'S', reward: '2,000 Gold • Hermes Boots', icon: '🏃' },
+        { id: 'G5', title: 'SprootTop Win98 Simulator', description: 'Windows 98 Sim on the Sproot.inc Laptop.', link: 'https://gantyfonta.github.io/Sproottop/', category: 'combat', categoryName: 'Bounty Quests', rank: 'A', reward: '1,000 Gold • Cyber Artifact', icon: '💻' },
+        { id: 'G6', title: 'Cess (Overloaded Chess)', description: 'Chess, but too much.', link: 'https://gantyfonta.github.io/cess/', category: 'combat', categoryName: 'Bounty Quests', rank: 'A', reward: '1,100 Gold • Grandmaster Crown', icon: '♟️' },
+        { id: 'G7', title: '2D Redstone Engine', description: '2D Minecraft redstone simulation featuring many redstone components.', link: 'https://gantyfonta.github.io/redstone/', category: 'combat', categoryName: 'Bounty Quests', rank: 'S', reward: '3,000 Gold • Redstone Core', icon: '⚡' },
+        { id: 'G8', title: 'Polytrack Racing', description: 'Play a drive game made by Kodub.', link: 'https://gantyfonta.github.io/polytrack/', category: 'combat', categoryName: 'Bounty Quests', rank: 'S', reward: '1,800 Gold • Nitro Engine', icon: '🏎️' },
+        { id: 'G9', title: 'Shapemon Duel', description: 'A Pokemon battle style game, but with shapes.', link: 'https://gantyfonta.github.io/Shapemon/', category: 'combat', categoryName: 'Bounty Quests', rank: 'B', reward: '750 Gold • Prism Stone', icon: '🔷' },
+        { id: 'G10', title: 'Retro Vault Emulator', description: 'Play several games from older consoles.', link: 'https://gantyfonta.github.io/wdbgub/emulator/index.html', category: 'combat', categoryName: 'Bounty Quests', rank: 'S', reward: '2,200 Gold • Nostalgia Gem', icon: '🕹️' },
+        { id: 'G11', title: 'Numberle Codebreaker', description: 'Play higher or lower in a wordle-ish number guessing game.', link: 'https://gantyfonta.github.io/Numberle/', category: 'combat', categoryName: 'Bounty Quests', rank: 'C', reward: '300 Gold • Decipher Ring', icon: '🔢' },
+        { id: 'G12', title: "Caesar's Spelling Bee", description: 'Spell out the spoken latin words.', link: 'https://gantyfonta.github.io/SpellingBee/', category: 'combat', categoryName: 'Bounty Quests', rank: 'B', reward: '550 Gold • Laurel Wreath', icon: '🐝' },
+        { id: 'G13', title: 'Online Chess Realm', description: 'Play chess against someone online.', link: 'https://gantyfonta.github.io/chess/', category: 'combat', categoryName: 'Bounty Quests', rank: 'B', reward: '650 Gold • Strategy Banner', icon: '🏰' },
+        { id: 'G14', title: 'Stonks Market Sim', description: 'Pretend you have stocks in an always changing stonks game.', link: 'https://gantyfonta.github.io/Stonks/', category: 'combat', categoryName: 'Bounty Quests', rank: 'B', reward: '800 Gold • Merchant Coin', icon: '📈' },
+        { id: 'G15', title: 'Forge of Legends', description: 'Make cool weapons, fight stuff. (Zoom out to see full weapons)', link: 'https://forge-of-legends-7e55fd62.base44.app/Forge', category: 'combat', categoryName: 'Bounty Quests', rank: 'S', reward: '3,500 Gold • Legendary Anvil', icon: '⚒️' },
+        { id: 'G16', title: 'Tavern Slot Machine', description: 'Two words: Slot Machine.', link: 'https://gantyfonta.github.io/Gambling/', category: 'combat', categoryName: 'Bounty Quests', rank: 'C', reward: '???? Gold • Gambler Token', icon: '🎰' },
+        { id: 'G17', title: 'Minotaur Maze Escape', description: 'Run from a minotaur in a maze.', link: 'https://gantyfonta.github.io/TheMaze/', category: 'combat', categoryName: 'Bounty Quests', rank: 'A', reward: '1,300 Gold • Labyrinth Map', icon: '🐂' },
+        { id: 'G18', title: 'Culinary Craft', description: 'Jesse, we need to cook.', link: 'https://culinary-craft-07cb0bc3.base44.app/', category: 'combat', categoryName: 'Bounty Quests', rank: 'A', reward: '1,400 Gold • Flask of Power', icon: '🧪' },
+
+        // MYSTERY & ARCANE (Misc)
+        { id: 'M1', title: 'Conflict Meeting Chamber', description: 'A room based meeting site that works like Zoom.', link: 'https://gantyfonta.github.io/conflict-chat/', category: 'arcane', categoryName: 'Arcane Mysteries', rank: 'A', reward: '1,200 Gold • Crystal Ball', icon: '🔮' },
+        { id: 'M2', title: 'Hand Physics Lab VR', description: 'A hand and face tracking simulation in 3D.', link: 'https://gantyfonta.github.io/HandPhysicsLab/', category: 'arcane', categoryName: 'Arcane Mysteries', rank: 'S', reward: '3,000 Gold • Spatial Gauntlets', icon: '🖐️' },
+        { id: 'M3', title: 'Grak the Caveman AI', description: 'Chat with Grak, a caveman AI.', link: 'https://preview--aura-chat-copy-255598c1.base44.app/Chat?hide_badge=true', category: 'arcane', categoryName: 'Arcane Mysteries', rank: 'B', reward: '500 Gold • Flint & Steel', icon: '🦴' },
+        { id: 'M4', title: 'Audio Synthesizer', description: 'Make music with arcane frequencies.', link: 'https://gantyfonta.github.io/synthesizer/', category: 'arcane', categoryName: 'Arcane Mysteries', rank: 'B', reward: '700 Gold • Bard Harp', icon: '🎵' },
+        { id: 'M5', title: 'Robert British AI', description: 'Talk to the ultimate codemaking British AI.', link: 'https://robert.base44.app', category: 'arcane', categoryName: 'Arcane Mysteries', rank: 'A', reward: '1,000 Gold • Monocle of Intellect', icon: '🎩' },
+        { id: 'M6', title: 'MultiCode Runner', description: 'Run most other websites / code inside of it.', link: 'https://gantyfonta.github.io/Multicoderunner/', category: 'arcane', categoryName: 'Arcane Mysteries', rank: 'S', reward: '2,800 Gold • Master Key', icon: '⚙️' },
+
+        // OINK GUILD (Oink Treats)
+        { id: 'O1', title: 'Oink-O-Clock Jump', description: 'The single greatest pig game ever made.', link: 'https://gantyfonta.github.io/oinkoclockjump/', category: 'oink', categoryName: 'Porcine Guild', rank: 'S', reward: '5,000 Gold • Golden Snout', icon: '🐷' },
+        { id: 'O2', title: 'OOCJ Duel Battles', description: 'Two players. See whos the ultimate pig.', link: 'https://gantyfonta.github.io/OOCJBattles/', category: 'oink', categoryName: 'Porcine Guild', rank: 'A', reward: '1,500 Gold • Pig Championship Belt', icon: '⚔️' },
+        { id: 'O3', title: 'Moinkcraft 2D Sandbox', description: 'A WIP 2D sandbox game about pigs.', link: 'https://gantyfonta.github.io/OOCJRouge/', category: 'oink', categoryName: 'Porcine Guild', rank: 'S', reward: '3,200 Gold • Mud Crown', icon: '⛏️' },
+
+        // SHADOW REALM (Familiar)
+        { id: 'E1', title: 'Sprootgle Parchment Docs', description: 'A very familiar seeming document program.', link: 'https://sproot-docs.base44.app', category: 'shadow', categoryName: 'Shadow Realm', rank: 'B', reward: '600 Gold • Illusion Scroll', icon: '📄' },
+        { id: 'E2', title: 'Sprootify Bardic Player', description: 'A music app for all your music needs.', link: 'https://vibefy.base44.app/', category: 'shadow', categoryName: 'Shadow Realm', rank: 'B', reward: '650 Gold • Siren Flute', icon: '🎧' },
+        { id: 'E3', title: 'Conflict Mirror Realm', description: 'A simple messaging app that looks familiar.', link: 'https://gantyfonta.github.io/conflict/', category: 'shadow', categoryName: 'Shadow Realm', rank: 'B', reward: '700 Gold • Shadow Mirror', icon: '💬' }
+      ];
+
+      // Rank Badges Styling Configuration
+      const rankStyles = {
+        'S': { bg: 'bg-amber-500/20 text-amber-300 border-amber-500/60', seal: 'bg-amber-700 text-amber-200' },
+        'A': { bg: 'bg-purple-500/20 text-purple-300 border-purple-500/60', seal: 'bg-purple-800 text-purple-200' },
+        'B': { bg: 'bg-blue-500/20 text-blue-300 border-blue-500/60', seal: 'bg-blue-800 text-blue-200' },
+        'C': { bg: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/60', seal: 'bg-emerald-800 text-emerald-200' },
       };
 
-      // Assign global slot codes (A1, A2, B1, B2...) to all items
-      const catalog = [];
-      Object.keys(projectData).forEach(catKey => {
-        const cat = projectData[catKey];
-        cat.items.forEach((item, idx) => {
-          const code = `${cat.rowCode}${idx + 1}`;
-          catalog.push({
-            ...item,
-            code,
-            categoryKey: catKey,
-            categoryName: cat.name,
-            icon: cat.icon
-          });
-        });
-      });
-
-      // -------------------- MAIN APP --------------------
       const App = () => {
-        const [typedCode, setTypedCode] = useState('');
-        const [activeCategory, setActiveCategory] = useState('all');
+        const [activeGuild, setActiveGuild] = useState('all');
+        const [activeRank, setActiveRank] = useState('all');
         const [searchQuery, setSearchQuery] = useState('');
-        const [displayMessage, setDisplayMessage] = useState('READY - ENTER CODE');
-        const [droppedItem, setDroppedItem] = useState(null);
+        const [acceptedQuests, setAcceptedQuests] = useState([]);
+        const [goldCoins, setGoldCoins] = useState(4850);
 
-        const handleKeypress = (char) => {
-          if (typedCode.length < 3) {
-            const nextCode = typedCode + char;
-            setTypedCode(nextCode);
-            setDisplayMessage(`SLOT: ${nextCode}`);
+        const handleAcceptQuest = (quest) => {
+          if (!acceptedQuests.includes(quest.id)) {
+            setAcceptedQuests([...acceptedQuests, quest.id]);
+            setGoldCoins(prev => prev + 500);
           }
+          window.open(quest.link, '_blank');
         };
 
-        const handleClear = () => {
-          setTypedCode('');
-          setDisplayMessage('READY - ENTER CODE');
-        };
-
-        const handleVend = () => {
-          if (!typedCode) {
-            setDisplayMessage('ENTER CODE FIRST');
-            return;
-          }
-          const found = catalog.find(i => i.code.toUpperCase() === typedCode.toUpperCase());
-          if (found) {
-            setDisplayMessage(`DISPENSING: ${found.code}`);
-            setDroppedItem(found);
-            setTimeout(() => {
-              window.open(found.link, '_blank');
-              setDisplayMessage('THANK YOU! DISPENSED');
-            }, 800);
-          } else {
-            setDisplayMessage('ERR: INVALID SLOT');
-            setTimeout(() => setDisplayMessage('READY - ENTER CODE'), 1500);
-          }
-        };
-
-        const handleSearchChange = (e) => {
-          const value = e.target.value;
-          setSearchQuery(value);
-          if (value.toLowerCase() === 'bird') window.location.href = 'bird.html';
-          if (value.toLowerCase() === 'jump') window.location.href = 'jump.html';
-        };
-
-        // Filter catalog by active category and search input
-        const filteredCatalog = catalog.filter(item => {
-          const matchesCategory = activeCategory === 'all' || item.categoryKey === activeCategory;
-          const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                                item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                                item.code.toLowerCase().includes(searchQuery.toLowerCase());
-          return matchesCategory && matchesSearch;
+        const filteredQuests = questCatalog.filter(q => {
+          const matchesGuild = activeGuild === 'all' || q.category === activeGuild;
+          const matchesRank = activeRank === 'all' || q.rank === activeRank;
+          const matchesSearch = q.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                q.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                q.reward.toLowerCase().includes(searchQuery.toLowerCase());
+          return matchesGuild && matchesRank && matchesSearch;
         });
 
         return (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
-            {/* VENDING MACHINE OUTER CABINET */}
-            <div className="bg-[#1C1D26] border-8 border-[#2A2B38] rounded-3xl p-6 sm:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.8)] relative overflow-hidden">
+            {/* TAVERN WOODEN FRAME CONTAINER */}
+            <div className="wood-panel border-8 border-[#3b2314] rounded-2xl p-6 sm:p-10 relative overflow-hidden">
               
-              {/* TOP HEADER / BRANDING */}
-              <div className="flex flex-col sm:flex-row justify-between items-center mb-8 border-b-4 border-[#2A2B38] pb-6 gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-4 h-4 rounded-full bg-emerald-400 animate-pulse"></div>
-                  <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-100 tracking-wider uppercase">
-                    Ganty-Mat <span className="text-emerald-400">3000</span>
-                  </h1>
+              {/* TOP HERO & GUILDMASTER HEADER */}
+              <div className="border-b-4 border-[#3b2314] pb-8 mb-8 flex flex-col md:flex-row justify-between items-center gap-6">
+                <div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-3xl">🛡️</span>
+                    <h1 className="medieval-title text-3xl sm:text-5xl font-black text-amber-200 tracking-wide drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)]">
+                      THE ADVENTURER'S GUILD
+                    </h1>
+                  </div>
+                  <p className="text-amber-400/80 text-sm sm:text-base mt-2 font-semibold">
+                    Select a bounty quest scroll below to embark on digital domain expeditions.
+                  </p>
                 </div>
 
-                {/* CATEGORY SELECTOR BUTTONS */}
-                <div className="flex flex-wrap justify-center gap-2">
-                  <button
-                    onClick={() => setActiveCategory('all')}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-bold transition-all ${
-                      activeCategory === 'all'
-                        ? 'bg-emerald-500 text-black shadow-[0_0_10px_rgba(16,185,129,0.5)]'
-                        : 'bg-[#2A2B38] text-slate-300 hover:bg-[#373849]'
-                    }`}
-                  >
-                    ALL SLOTS
-                  </button>
-                  {Object.keys(projectData).map(catKey => {
-                    const cat = projectData[catKey];
-                    return (
+                {/* ADVENTURER STAT CARD */}
+                <div className="bg-[#120a06] border-2 border-[#5c3a21] rounded-xl p-4 flex items-center gap-6 shadow-inner min-w-[280px]">
+                  <div className="relative">
+                    <div className="w-14 h-14 rounded-full bg-amber-900/60 border-2 border-amber-500 flex items-center justify-center text-2xl shadow-lg">
+                      🧙‍♂️
+                    </div>
+                    <span className="absolute -bottom-1 -right-1 bg-amber-600 text-black text-[10px] font-black px-1.5 py-0.5 rounded-full border border-black">
+                      LVL 34
+                    </span>
+                  </div>
+                  <div>
+                    <h4 className="medieval-title text-amber-200 font-bold text-lg">Guildmaster Ganty</h4>
+                    <div className="flex items-center gap-4 text-xs mt-1 mono-text">
+                      <span className="text-amber-400 font-bold flex items-center gap-1">
+                        🪙 {goldCoins.toLocaleString()} GP
+                      </span>
+                      <span className="text-emerald-400 font-bold">
+                        📜 {acceptedQuests.length} Quests
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* FILTERING CONTROLS PANEL */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+                
+                {/* SEARCH PARCHMENT INPUT */}
+                <div className="lg:col-span-5">
+                  <label className="block text-xs text-amber-400/80 font-bold mb-2 uppercase tracking-wider">
+                    Search Quest Archives
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      className="w-full bg-[#ebd2ad] text-[#2b1810] placeholder-[#6b4733] font-bold border-2 border-[#b38e58] rounded-lg px-4 py-2.5 pl-10 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all text-sm shadow-md"
+                      placeholder="Search quest name, reward, keyword..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    <span className="absolute left-3 top-2.5 text-base text-[#6b4733]">🔍</span>
+                  </div>
+                </div>
+
+                {/* GUILD / CATEGORY FILTER BUTTONS */}
+                <div className="lg:col-span-7 flex flex-col justify-end">
+                  <label className="block text-xs text-amber-400/80 font-bold mb-2 uppercase tracking-wider">
+                    Guild Halls & Ranks
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    
+                    {/* Guild Filter Pills */}
+                    {[
+                      { key: 'all', label: 'All Guilds', icon: '🏛️' },
+                      { key: 'sage', label: 'Sage Scrolls', icon: '📜' },
+                      { key: 'combat', label: 'Bounty Quests', icon: '⚔️' },
+                      { key: 'arcane', label: 'Arcane', icon: '🔮' },
+                      { key: 'oink', label: 'Porcine Guild', icon: '🐷' },
+                      { key: 'shadow', label: 'Shadow Realm', icon: '👁️' }
+                    ].map(g => (
                       <button
-                        key={catKey}
-                        onClick={() => setActiveCategory(catKey)}
-                        className={`px-3 py-1.5 rounded-lg text-sm font-bold transition-all flex items-center gap-1 ${
-                          activeCategory === catKey
-                            ? 'bg-emerald-500 text-black shadow-[0_0_10px_rgba(16,185,129,0.5)]'
-                            : 'bg-[#2A2B38] text-slate-300 hover:bg-[#373849]'
+                        key={g.key}
+                        onClick={() => setActiveGuild(g.key)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border ${
+                          activeGuild === g.key
+                            ? 'bg-amber-600 text-black border-amber-300 shadow-[0_0_10px_rgba(217,119,6,0.5)]'
+                            : 'bg-[#120a06] text-amber-300/80 border-[#3b2314] hover:bg-[#2b1810]'
                         }`}
                       >
-                        <span>{cat.icon}</span> [{cat.rowCode}] {cat.name}
+                        <span>{g.icon}</span> {g.label}
                       </button>
+                    ))}
+
+                    <div className="h-6 w-0.5 bg-[#3b2314] self-center mx-1 hidden sm:block"></div>
+
+                    {/* Rank Filter Pills */}
+                    {['all', 'S', 'A', 'B', 'C'].map(r => (
+                      <button
+                        key={r}
+                        onClick={() => setActiveRank(r)}
+                        className={`px-2.5 py-1 rounded text-xs font-black transition-all border ${
+                          activeRank === r
+                            ? 'bg-amber-400 text-black border-amber-200'
+                            : 'bg-[#120a06] text-amber-400/60 border-[#3b2314] hover:text-amber-200'
+                        }`}
+                      >
+                        {r === 'all' ? 'RANK ALL' : `RANK ${r}`}
+                      </button>
+                    ))}
+
+                  </div>
+                </div>
+
+              </div>
+
+              {/* QUEST BOARD PARCHMENT CARDS GRID */}
+              {filteredQuests.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredQuests.map((quest) => {
+                    const style = rankStyles[quest.rank];
+                    const isAccepted = acceptedQuests.includes(quest.id);
+
+                    return (
+                      <div
+                        key={quest.id}
+                        className="parchment-card rounded-xl p-5 relative flex flex-col justify-between transition-all duration-300 hover:-translate-y-2 group"
+                      >
+                        {/* CARD TOP BAR: RANK BADGE & WAX SEAL */}
+                        <div>
+                          <div className="flex justify-between items-center mb-3">
+                            <span className={`px-2.5 py-0.5 rounded border text-xs font-black mono-text ${style.bg}`}>
+                              RANK {quest.rank}
+                            </span>
+                            
+                            {/* Decorative Wax Seal Icon */}
+                            <div className={`w-8 h-8 rounded-full ${style.seal} wax-seal flex items-center justify-center text-sm font-bold shadow-md`}>
+                              {quest.icon}
+                            </div>
+                          </div>
+
+                          {/* QUEST TITLE & DESCRIPTION */}
+                          <h3 className="medieval-title font-black text-xl text-[#2b1810] group-hover:text-amber-900 transition-colors leading-tight mb-2">
+                            {quest.title}
+                          </h3>
+                          
+                          <p className="text-xs text-[#523324] font-medium leading-relaxed mb-4">
+                            {quest.description}
+                          </p>
+                        </div>
+
+                        {/* REWARD INFO & ACCEPT BUTTON */}
+                        <div>
+                          <div className="border-t border-[#b38e58]/50 pt-3 mb-4 flex items-center justify-between text-xs font-bold text-[#422619] mono-text">
+                            <span>REWARD:</span>
+                            <span className="text-amber-900 bg-amber-200/60 px-2 py-0.5 rounded border border-amber-400/50">
+                              {quest.reward}
+                            </span>
+                          </div>
+
+                          <button
+                            onClick={() => handleAcceptQuest(quest)}
+                            className={`w-full py-2.5 rounded-lg font-black medieval-title tracking-wider text-sm transition-all shadow-md flex items-center justify-center gap-2 ${
+                              isAccepted
+                                ? 'bg-emerald-800 text-emerald-100 hover:bg-emerald-700 border border-emerald-600'
+                                : 'bg-[#3b1d11] text-amber-200 hover:bg-[#592c19] border border-[#6f3820] hover:text-white'
+                            }`}
+                          >
+                            <span>{isAccepted ? '✓ COMPLETED' : '⚔️ ACCEPT QUEST'}</span>
+                          </button>
+                        </div>
+                      </div>
                     );
                   })}
                 </div>
-              </div>
-
-              {/* MAIN LAYOUT: GLASS SHELVES (LEFT) + CONTROL PANEL (RIGHT) */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                
-                {/* GLASS DISPLAY CABINET (ITEMS) */}
-                <div className="lg:col-span-8 vending-glass border-4 border-[#2A2B38] rounded-2xl p-6 min-h-[550px] flex flex-col justify-between relative overflow-y-auto max-h-[700px]">
-                  
-                  {filteredCatalog.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                      {filteredCatalog.map((item) => (
-                        <div
-                          key={item.code}
-                          onClick={() => {
-                            setTypedCode(item.code);
-                            setDisplayMessage(`SELECTED: ${item.code}`);
-                          }}
-                          className={`group relative bg-[#13141C]/80 border-2 rounded-xl p-4 cursor-pointer transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between ${
-                            typedCode === item.code
-                              ? 'border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.4)]'
-                              : 'border-slate-700/60 hover:border-slate-400'
-                          }`}
-                        >
-                          {/* Slot Sticker Badge */}
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="mono-text bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2.5 py-0.5 rounded text-xs font-bold">
-                              {item.code}
-                            </span>
-                            <span className="text-xl">{item.icon}</span>
-                          </div>
-
-                          {/* Item Title & Description */}
-                          <div className="my-2">
-                            <h3 className="font-bold text-slate-100 text-lg group-hover:text-emerald-400 transition-colors leading-snug">
-                              {item.title}
-                            </h3>
-                            <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
-                              {item.description}
-                            </p>
-                          </div>
-
-                          {/* Decorative Spiral Coil Springs */}
-                          <div className="coil-spring h-3 w-full rounded mt-3 border-t border-slate-700/40"></div>
-
-                          {/* Click-to-Select CTA */}
-                          <a
-                            href={item.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
-                            className="mt-3 block text-center bg-slate-800 hover:bg-emerald-500 hover:text-black text-xs font-bold text-slate-300 py-1.5 rounded transition-all"
-                          >
-                            DIRECT OPEN ➔
-                          </a>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="m-auto text-center py-16">
-                      <div className="text-5xl mb-4">🤖</div>
-                      <h3 className="text-xl font-bold text-slate-300">Slot Empty or Not Found</h3>
-                      <p className="text-sm text-slate-500 mt-1">Try resetting search query or selecting another row.</p>
-                    </div>
-                  )}
-
+              ) : (
+                <div className="text-center py-20 bg-[#120a06]/50 rounded-xl border-2 border-dashed border-[#3b2314]">
+                  <div className="text-6xl mb-3">📜</div>
+                  <h3 className="medieval-title text-2xl text-amber-300 font-bold">No Bounty Scrolls Found</h3>
+                  <p className="text-xs text-amber-500/70 mt-1">Try resetting your guild filters or search term.</p>
                 </div>
-
-                {/* KEYPAD CONTROL PANEL (RIGHT SIDE) */}
-                <div className="lg:col-span-4 bg-[#14151E] border-4 border-[#2A2B38] rounded-2xl p-6 flex flex-col justify-between">
-                  <div>
-                    {/* LED DISPLAY SCREEN */}
-                    <div className="mb-6">
-                      <div className="text-xs text-slate-400 font-bold mb-1 tracking-wider uppercase flex justify-between">
-                        <span>Vending Status</span>
-                        <span>24V DIGITAL</span>
-                      </div>
-                      <div className="led-display rounded-lg p-4 text-2xl font-bold tracking-widest text-center border-2 border-emerald-900/50 min-h-[70px] flex items-center justify-center">
-                        {displayMessage}
-                      </div>
-                    </div>
-
-                    {/* SEARCH INPUT */}
-                    <div className="mb-6">
-                      <label className="block text-xs text-slate-400 font-bold mb-1 tracking-wider uppercase">
-                        Quick Filter:
-                      </label>
-                      <input
-                        type="text"
-                        className="w-full bg-[#1C1D26] border border-slate-700 rounded-lg px-3 py-2 text-slate-200 text-sm focus:outline-none focus:border-emerald-400 transition-colors"
-                        placeholder="Search title, desc, or code..."
-                        value={searchQuery}
-                        onChange={handleSearchChange}
-                      />
-                    </div>
-
-                    {/* NUMERIC & LETTER KEYPAD */}
-                    <div className="mb-6">
-                      <label className="block text-xs text-slate-400 font-bold mb-2 tracking-wider uppercase text-center">
-                        Keypad Matrix
-                      </label>
-                      
-                      {/* Letters (A, B, C, D, E) */}
-                      <div className="grid grid-cols-5 gap-2 mb-3">
-                        {['A', 'B', 'C', 'D', 'E'].map(char => (
-                          <button
-                            key={char}
-                            onClick={() => handleKeypress(char)}
-                            className="bg-[#2A2B38] hover:bg-emerald-500 hover:text-black text-slate-100 font-bold py-2.5 rounded-lg border-b-4 border-[#181922] active:border-b-0 active:translate-y-1 transition-all text-sm"
-                          >
-                            {char}
-                          </button>
-                        ))}
-                      </div>
-
-                      {/* Numbers (1 - 9) */}
-                      <div className="grid grid-cols-3 gap-2 mb-3">
-                        {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map(num => (
-                          <button
-                            key={num}
-                            onClick={() => handleKeypress(num)}
-                            className="bg-[#2A2B38] hover:bg-emerald-500 hover:text-black text-slate-100 font-bold py-2.5 rounded-lg border-b-4 border-[#181922] active:border-b-0 active:translate-y-1 transition-all text-sm"
-                          >
-                            {num}
-                          </button>
-                        ))}
-                      </div>
-
-                      {/* Action Buttons (Clear & Vend) */}
-                      <div className="grid grid-cols-2 gap-2">
-                        <button
-                          onClick={handleClear}
-                          className="bg-rose-900/40 hover:bg-rose-600 text-rose-200 hover:text-white font-bold py-3 rounded-lg border-b-4 border-rose-950 active:border-b-0 active:translate-y-1 transition-all text-sm"
-                        >
-                          CLEAR
-                        </button>
-                        <button
-                          onClick={handleVend}
-                          className="bg-emerald-600 hover:bg-emerald-400 text-slate-950 font-extrabold py-3 rounded-lg border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1 transition-all text-sm tracking-wider shadow-[0_0_15px_rgba(16,185,129,0.3)]"
-                        >
-                          VEND ➔
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* COIN SLOT / DROP TRAY GRAPHIC */}
-                  <div className="mt-4 border-t-2 border-slate-800 pt-4">
-                    <div className="bg-[#0C0D12] border-2 border-slate-800 rounded-xl p-4 text-center">
-                      <div className="text-xs text-slate-500 font-bold mb-1 uppercase tracking-wider">
-                        PUSH RETRIEVAL SLOT
-                      </div>
-                      <div className="bg-[#181924] h-10 rounded border-b-2 border-slate-700 flex items-center justify-center text-xs text-slate-400 font-mono">
-                        {droppedItem ? (
-                          <span className="text-emerald-400 font-bold animate-bounce">
-                            🎁 DISPENSED: {droppedItem.title}
-                          </span>
-                        ) : (
-                          '=== PUSH ==='
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-
-              </div>
+              )}
 
               {/* FOOTER */}
-              <footer className="mt-8 pt-4 border-t-2 border-[#2A2B38] text-center text-xs text-slate-500 font-mono">
-                © 2026 GantyFonta. All items stocked fresh daily.
+              <footer className="mt-12 pt-6 border-t-2 border-[#3b2314] text-center text-xs text-amber-500/60 mono-text">
+                © 2026 Ganty's Adventurer Guild. Bounties subject to immediate realm teleportation.
               </footer>
 
             </div>
